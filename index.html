@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AUDITORÍAS 5S - AMFA VITRUM</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        :root { --primary: #1a73e8; --danger: #d93025; --success: #1e8e3e; --na: #5f6368; --bg: #f8f9fa; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg); margin: 0; padding: 10px; -webkit-tap-highlight-color: transparent; }
+        .container { max-width: 900px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin: auto; }
+        .header-title { text-align: center; padding: 15px; border-bottom: 2px solid #e8f0fe; color: var(--primary); margin: 0; }
+        .seccion { display: none; padding: 20px; }
+        .seccion.active { display: block; }
+        .grid-header { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; background: #fdfdfd; padding: 15px; border-radius: 8px; border: 1px solid #eee; }
+        .field { display: flex; flex-direction: column; margin-bottom: 10px; }
+        label { font-size: 0.8rem; font-weight: bold; color: #5f6368; margin-bottom: 5px; text-transform: uppercase; }
+        input, select, textarea { padding: 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 16px; width: 100%; box-sizing: border-box; -webkit-appearance: none; }
+        .zona-header { background: #34495e; color: white; padding: 12px 15px; font-weight: bold; text-transform: uppercase; margin-top: 20px; border-radius: 4px; }
+        .item-pregunta { padding: 15px; border-bottom: 1px solid #f1f3f4; background: white; border: 2px solid transparent; border-radius: 8px; margin-bottom: 5px; }
+        .error-resaltado { border: 3px dashed var(--danger) !important; background: #fff8f8 !important; }
+        .opciones-respuesta { display: flex; gap: 8px; margin-top: 10px; }
+        .opt-label { flex: 1; text-align: center; padding: 10px; border: 1px solid #dadce0; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; min-height: 45px; }
+        input[type="radio"] { display: none; }
+        input[value="B"]:checked + .opt-label { background: var(--success); color: white; border-color: var(--success); }
+        input[value="M"]:checked + .opt-label { background: var(--danger); color: white; border-color: var(--danger); }
+        input[value="NA"]:checked + .opt-label { background: var(--na); color: white; border-color: var(--na); }
+        .nc-box { display: none; background: #fff5f5; padding: 15px; border-radius: 4px; margin-top: 10px; border-left: 4px solid var(--danger); }
+        .gallery { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .thumb-container { position: relative; width: 80px; height: 80px; }
+        .thumb { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; border: 1px solid #ccc; }
+        .btn-del { position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; width: 22px; height: 22px; border: none; }
+        .btn-blue { background: var(--primary); color: white; border: none; padding: 18px; width: 100%; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        #modalConfirm { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center; }
+        .modal-content { background:white; padding:20px; border-radius:8px; width:90%; max-width:400px; text-align:center; }
+    </style>
+</head>
+<body onload="cargarProgreso()">
+
+<div id="modalConfirm">
+    <div class="modal-content">
+        <h3>Auditoría Lista</h3>
+        <p>¿Qué desea hacer con los datos?</p>
+        <button class="btn-blue" onclick="procesarFinal(true)">DESCARGAR Y LIMPIAR TODO</button>
+        <button class="btn-blue" style="background:#607d8b" onclick="procesarFinal(false)">SOLO DESCARGAR EXCEL</button>
+    </div>
+</div>
+
+<div class="container">
+    <h2 class="header-title">AUDITORÍAS 5S - AMFA VITRUM</h2>
+    <form id="mainForm">
+        <div id="paso1" class="seccion active">
+            <div class="grid-header">
+                <div class="field"><label>AUDITOR *</label><select id="info-auditor" onchange="quitarError(this)"><option value="">Seleccione...</option><option>Manuel Yucra</option><option>Bladimir Palacios</option><option>Christian Vargas</option><option>Sandra Diaz</option><option>Edwin Mariano</option><option>Stephanie Quispe</option><option>Henry Eulogio</option><option>Jerol Rojas</option><option>Eduar Monsalve</option><option>Victor Paredes</option><option>Julio More</option></select></div>
+                <div class="field"><label>FECHA *</label><input type="date" id="info-fecha" onchange="quitarError(this)"></div>
+                <div class="field"><label>HORA *</label><input type="time" id="info-hora" onchange="quitarError(this)"></div>
+                <div class="field"><label>LÍNEA *</label><select id="info-linea" onchange="quitarError(this)"><option value="">Seleccione...</option><option>MA-01</option><option>MA-02</option><option>MA-03</option><option>MA-04</option><option>MA-05</option><option>MA-06</option><option>MA-08</option><option>MA-09</option><option>MA-10</option><option>FV-01</option><option>FV-03</option><option>FV-04</option><option>FV-05</option><option>FV-06</option></select></div>
+                <div class="field"><label>REGULADOR *</label><select id="info-regulador" onchange="quitarError(this)"><option value="">Seleccione...</option><option value="NA">NA</option><option>Julian Flores</option><option>Armando Bernaola</option><option>Milton Garcia</option><option>German Guzman</option><option>Alexis Lopez</option><option>Antonio Martinez</option><option>Luis Fernandez</option><option>Angel Sanchez</option><option>Roberto Amasifuen</option><option>Roberto Espinoza</option><option>Max Fatama</option></select></div>
+                <div class="field"><label>OPERADOR *</label><input type="text" id="info-operador" placeholder="o NA" oninput="quitarError(this)"></div>
+                <div class="field"><label>VERIFICADOR *</label><input type="text" id="info-verificador" placeholder="o NA" oninput="quitarError(this)"></div>
+                <div class="field"><label>ESTADO *</label><select id="info-estado" onchange="quitarError(this)"><option value="">Seleccione...</option><option>EN OPERACION</option><option>EN PREPARACION</option><option>INHABILITADA</option></select></div>
+                <div class="field"><label>OP (9 DÍG o NA) *</label><input type="text" id="info-op" placeholder="Ej: 123456789" oninput="quitarError(this)"></div>
+                <div class="field"><label>LOTE *</label><input type="text" id="info-lote" placeholder="o NA" oninput="quitarError(this)"></div>
+            </div>
+            <button type="button" class="btn-blue" onclick="irAPaso2()">CONTINUAR EVALUACIÓN</button>
+        </div>
+
+        <div id="paso2" class="seccion">
+            <div id="contenedor-preguntas">
+                </div>
+            <button type="button" class="btn-blue" style="background:var(--success)" onclick="validarAuditoria()">FINALIZAR Y DESCARGAR</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    const preguntasData = [
+        {z: "MATERIA PRIMA", p: "¿No hay objetos innecesarios en la zona (herramientas, guantes, etc.) y solo se encuentra materia prima para la OP actual?"},
+        {z: "MATERIA PRIMA", p: "¿La materia prima y soporte tienen un lugar asignado y están ubicados correctamente?"},
+        {z: "MATERIA PRIMA", p: "¿El área está limpia y libre de cartones, plásticos, polvo o residuos?"},
+        {z: "MATERIA PRIMA", p: "¿Las delimitaciones y rótulos de la zona de materia prima están en buen estado?"},
+        {z: "FORMADORA", p: "¿El área está libre de objetos ajenos a la actividad(ej. cartones, plástico, escoba, trapos, herramientas,etc.)?"},
+        {z: "FORMADORA", p: "¿El depósito de merma contiene solo piezas del lote en producción?"},
+        {z: "FORMADORA", p: "¿Los elementos (encendedor, aceite, agua) tienen un lugar asignado y están ubicados correctamente?"},
+        {z: "FORMADORA", p: "¿La formadora y elementos de su entorno (ej. tacho, tablero, tuberías) están limpios, sin grasa, polvo ni residuos de vidrio?"},
+        {z: "FORMADORA", p: "¿Existen delimitaciones y rótulos en buen estado (ej. mandriles, mecheros, controles, alarmas, tuberías, tachos, etc.)?"},
+        {z: "IMPRESIÓN", p: "¿No hay materiales ajenos a la actividad propia del lugar (trapos, cartones, herramientas, etc.)?"},
+        {z: "IMPRESIÓN", p: "¿No se encuentran mezclados los productos (ej. papel higiénico, trapos, plásticos, etc.) y productos de prueba, o no conformes, en los tachos de basura?"},
+        {z: "IMPRESIÓN", p: "¿El área, piso, y tachos se encuentran limpios, libres de residuos de vidrio, polvo, manchas de pintura o grasa?"},
+        {z: "IMPRESIÓN", p: "¿La cadena, los tachos, los equipos, los botones y las señalizaciones de seguridad están claramente rotulados?"},
+        {z: "COCHE", p: "¿No se observan objetos ajenos al coche (ej. Objetos personales, afloja todo, piezas de máquina, etc.)?"},
+        {z: "COCHE", p: "¿Todos los elementos del coche (materiales, pintura, aceite, herramienta, etc.) tienen un lugar asignado?"},
+        {z: "COCHE", p: "¿El coche y su área se perciben limpios?"},
+        {z: "COCHE", p: "¿Las delimitaciones y rótulos el coche están en buen estado?"},
+        {z: "HORNO Y TABLERO", p: "¿No existen objetos innecesarios o ajenos en la zona del horno?"},
+        {z: "HORNO Y TABLERO", p: "Los elementos de la zona, piso y horno están limpios (ej. piso limpio, libre de polvo, derrames, etc.)"},
+        {z: "HORNO Y TABLERO", p: "¿Existen señales visuales (riesgo de alta temperatura, botones, horno) están visibles y en buen estado?"},
+        {z: "EMBALAJE", p: "¿No hay materiales ajenos a la actividad propia del lugar (trapos, cartones, herramientas, etc.)?"},
+        {z: "EMBALAJE", p: "Los elementos de la zona y el piso están limpios (ej. libre de residuos, polvo, grasa o manchas)"},
+        {z: "EMBALAJE", p: "¿Las partes, los elementos y las zonas de trabajo están rotuladas y en buen estado?"},
+        {z: "MESA DE REVISIÓN", p: "¿No se observan objetos ajenos a la mesa de revisión (ej. Objetos personales, piezas de máquina, etc.)?"},
+        {z: "MESA DE REVISIÓN", p: "¿Los elementos (bandejas, stickers, bandejas por revisar, revisadas) están en su lugar asignado?"},
+        {z: "MESA DE REVISIÓN", p: "La mesa y su área se perciben limpios"},
+        {z: "MESA DE REVISIÓN", p: "¿Las instalaciones (vidrio, conexiones, banco), delimitaciones y rótulos están en buen estado?"},
+        {z: "MESA DE REVISIÓN", p: "No se observan objetos innecesarios (ej. stretch film, cartones, bolsas) en el área de la parihuela"},
+        {z: "PRODUCTO TERMINADO", p: "¿El producto terminado tiene un lugar asignado y está ubicado correctamente?"},
+        {z: "PRODUCTO TERMINADO", p: "¿Cada bandeja está identificada con su sticker de datos y su tapa de acuerdo al tamaño?"},
+        {z: "PRODUCTO TERMINADO", p: "Los elementos de la zona y el piso están limpios (libre de vidrio, polvo, grasa o manchas)"},
+        {z: "PRODUCTO TERMINADO", p: "¿Las delimitaciones y rótulo de la zona y los stickers de cada bandeja están en buen estado?"},
+        {z: "PERSONAL Y LÍNEA", p: "¿Se han retirado elementos innecesarios de las zonas de tránsito?"},
+        {z: "PERSONAL Y LÍNEA", p: "¿Se han dispuesto artículos y herramientas por uso diario y ocasionales correctamente?"},
+        {z: "PERSONAL Y LÍNEA", p: "¿Existen espacios y elementos para disponer la basura y se encuentran delimitados?"},
+        {z: "PERSONAL Y LÍNEA", p: "¿El piso y las áreas comunes están limpias y libres de residuos o derrames?"},
+        {z: "PERSONAL Y LÍNEA", p: "¿Los pisos están en buenas condiciones físicas, parejos, regulares, no resbaladizos?"},
+        {z: "PERSONAL Y LÍNEA", p: "¿Las señales visuales y delimitaciones se mantienen uniformes en toda la línea?"},
+        {z: "PERSONAL Y LÍNEA", p: "¿Usa correctamente sus EPP's (ej. zapatos, tapones auditivos, lentes y guantes)?"},
+        {z: "PERSONAL Y LÍNEA", p: "¿Existen observaciones realizadas en auditorías anteriores que no han sido corregidas?"},
+        {z: "PERSONAL Y LÍNEA", p: "¿Su uniforme se encuentra en buenas condiciones y es acorde al modelo vigente?"},
+        {z: "PERSONAL Y LÍNEA", p: "¿El personal conoce y aplica la importancia de las 5S?"}
+    ];
+
+    function renderizarPreguntas() {
+        const cont = document.getElementById('contenedor-preguntas');
+        let currentZona = "";
+        preguntasData.forEach((item, i) => {
+            const id = i + 1;
+            if(item.z !== currentZona) {
+                const header = document.createElement('div');
+                header.className = 'zona-header'; header.innerText = item.z;
+                cont.appendChild(header);
+                currentZona = item.z;
+            }
+            const div = document.createElement('div');
+            div.className = 'item-pregunta'; div.id = `card-${id}`;
+            div.innerHTML = `
+                <p><strong>${id}.</strong> ${item.p}</p>
+                <div class="opciones-respuesta">
+                    <input type="radio" name="p${id}" id="p${id}b" value="B" onclick="handleRadio(${id}, 'B')"><label class="opt-label" for="p${id}b">BUENO</label>
+                    <input type="radio" name="p${id}" id="p${id}m" value="M" onclick="handleRadio(${id}, 'M')"><label class="opt-label" for="p${id}m">MALO</label>
+                    <input type="radio" name="p${id}" id="p${id}na" value="NA" onclick="handleRadio(${id}, 'NA')"><label class="opt-label" for="p${id}na">NA</label>
+                </div>
+                <div id="nc-${id}" class="nc-box">
+                    <textarea id="obs-${id}" placeholder="Describa el hallazgo..." oninput="verificarItemCompleto(${id})"></textarea>
+                    <div class="gallery" id="gal-${id}"></div>
+                    <label style="background:#5f6368;color:white;padding:12px;border-radius:4px;display:block;text-align:center;margin-top:10px;font-size:0.9rem;">
+                        📷 FOTO OBLIGATORIA <input type="file" accept="image/*" capture="environment" style="display:none" onchange="subirFoto(${id}, this)">
+                    </label>
+                </div>`;
+            cont.appendChild(div);
+        });
+    }
+
+    function handleRadio(id, val) {
+        document.getElementById('nc-'+id).style.display = (val==='M'?'block':'none');
+        verificarItemCompleto(id);
+        guardarProgreso();
+    }
+
+    function verificarItemCompleto(id) {
+        const r = document.querySelector(`input[name="p${id}"]:checked`);
+        const card = document.getElementById('card-'+id);
+        if(!r) return;
+        let ok = (r.value !== 'M') || (document.getElementById('obs-'+id).value.trim().length >= 3 && document.getElementById('gal-'+id).children.length > 0);
+        if(ok) card.classList.remove('error-resaltado');
+        guardarProgreso();
+    }
+
+    function irAPaso2() {
+        const opVal = document.getElementById('info-op').value.trim();
+        const opRegex = /^(\d{9}|na)$/i;
+        const ids = ['info-auditor','info-fecha','info-hora','info-linea','info-regulador','info-operador','info-verificador','info-estado','info-op','info-lote'];
+        let err = false;
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            let valErr = !el.value || (id==='info-op' && !opRegex.test(opVal));
+            if(valErr) { el.classList.add('error-resaltado'); err = true; }
+        });
+        if(err) return alert("Complete los datos. OP: 9 dígitos o NA.");
+        document.getElementById('paso1').classList.remove('active');
+        document.getElementById('paso2').classList.add('active');
+        window.scrollTo(0,0);
+    }
+
+    function subirFoto(id, input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const div = document.createElement('div');
+                div.className = 'thumb-container'; div.dataset.base = e.target.result;
+                div.innerHTML = `<img src="${e.target.result}" class="thumb"><button class="btn-del" type="button" onclick="this.parentElement.remove(); verificarItemCompleto(${id});">×</button>`;
+                document.getElementById('gal-'+id).appendChild(div);
+                verificarItemCompleto(id);
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function validarAuditoria() {
+        let error = false; let primerErr = null;
+        for(let i=1; i<=42; i++) {
+            const r = document.querySelector(`input[name="p${i}"]:checked`);
+            const fail = !r || (r.value==='M' && (document.getElementById('obs-'+i).value.trim().length < 3 || document.getElementById('gal-'+i).children.length === 0));
+            if(fail) {
+                const card = document.getElementById('card-'+i);
+                card.classList.add('error-resaltado');
+                if(!primerErr) primerErr = card;
+                error = true;
+            }
+        }
+        if(error) { primerErr.scrollIntoView({behavior:'smooth', block:'center'}); return alert("Faltan respuestas o evidencias (fotos/hallazgos)."); }
+        document.getElementById('modalConfirm').style.display = 'flex';
+    }
+
+    async function procesarFinal(limpiar) {
+        document.getElementById('modalConfirm').style.display = 'none';
+        await generarExcel();
+        if(limpiar) { localStorage.removeItem('audit5S_backup'); location.reload(); }
+    }
+
+    async function generarExcel() {
+        const wb = new ExcelJS.Workbook();
+        const ws = wb.addWorksheet('Auditoria');
+        
+        // RESTRICCIÓN DE FORMATO: Definición de columnas solicitadas
+        let cols = [
+            {header:'FECHA',key:'f',width:12},
+            {header:'AUDITOR',key:'a',width:20},
+            {header:'LINEA',key:'l',width:10},
+            {header:'REGULADOR',key:'reg',width:15},
+            {header:'OP',key:'op',width:12}
+        ];
+        // Columnas dinámicas: P, Hallazgo, Imagen
+        for(let i=1; i<=42; i++) {
+            cols.push({header:`P${i}`, key:`p${i}`, width:8}, {header:`HALLAZGO${i}`, key:`nc${i}`, width:25}, {header:`IMG${i}`, key:`img${i}`, width:15});
+        }
+        ws.columns = cols;
+
+        const info = {
+            f: document.getElementById('info-fecha').value,
+            a: document.getElementById('info-auditor').value,
+            l: document.getElementById('info-linea').value,
+            reg: document.getElementById('info-regulador').value,
+            op: document.getElementById('info-op').value.toUpperCase()
+        };
+
+        for(let i=1; i<=42; i++) {
+            const val = document.querySelector(`input[name="p${i}"]:checked`).value;
+            info[`p${i}`] = val;
+            info[`nc${i}`] = val === 'M' ? document.getElementById('obs-'+i).value : '';
+        }
+
+        const row = ws.addRow(info);
+        row.height = 90;
+
+        // Inserción de imágenes en las columnas IMG correspondientes
+        for(let i=1; i<=42; i++) {
+            const gal = document.getElementById('gal-'+i);
+            if(gal.children.length > 0) {
+                const imgData = gal.children[0].dataset.base;
+                const imgId = wb.addImage({ base64: imgData, extension: 'png' });
+                const colIdx = 5 + (i-1)*3 + 2; // Columna de IMG para la pregunta i
+                ws.addImage(imgId, { tl: { col: colIdx, row: 1 }, ext: { width: 110, height: 110 } });
+            }
+        }
+
+        const buf = await wb.xlsx.writeBuffer();
+        saveAs(new Blob([buf]), `Audit_${info.l}_${info.f}.xlsx`);
+    }
+
+    function quitarError(el) { el.classList.remove('error-resaltado'); guardarProgreso(); }
+    function guardarProgreso() {
+        const data = {};
+        document.querySelectorAll('input[type="text"], select, input[type="date"], input[type="time"], textarea').forEach(el => data[el.id] = el.value);
+        document.querySelectorAll('input[type="radio"]:checked').forEach(el => data[el.name] = el.value);
+        localStorage.setItem('audit5S_backup', JSON.stringify(data));
+    }
+    function cargarProgreso() {
+        renderizarPreguntas();
+        const raw = localStorage.getItem('audit5S_backup');
+        if(!raw) return;
+        const data = JSON.parse(raw);
+        for(let key in data) {
+            const el = document.getElementById(key);
+            if(el) el.value = data[key];
+            const rb = document.querySelector(`input[name="${key}"][value="${data[key]}"]`);
+            if(rb) { rb.checked = true; if(data[key]==='M') document.getElementById('nc-'+key.replace('p','')).style.display = 'block'; }
+        }
+    }
+</script>
+</body>
+</html>
