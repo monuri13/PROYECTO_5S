@@ -36,19 +36,19 @@
         .modal-content { background:white; padding:20px; border-radius:8px; width:90%; max-width:400px; text-align:center; }
     </style>
 </head>
-<body onload="inicializarFormulario()">
+<body onload="inicializar()">
 
 <div id="modalConfirm">
     <div class="modal-content">
         <h3>Auditoría Finalizada</h3>
-        <p>¿Qué desea hacer con los datos actuales?</p>
+        <p>¿Qué desea hacer con los datos?</p>
         <button class="btn-blue" onclick="procesarFinal(true)">DESCARGAR Y LIMPIAR TODO</button>
-        <button class="btn-blue" style="background:#607d8b" onclick="procesarFinal(false)">SOLO DESCARGAR EXCEL</button>
+        <button class="btn-blue" style="background:#607d8b" onclick="procesarFinal(false)">SOLO DESCARGAR</button>
     </div>
 </div>
 
 <div class="container">
-    <h2 class="header-title">AUDITORÍAS 5S - AMFA VITRUM</h2>
+    <h2 class="header-title">5S AMFA - AUDITORÍA</h2>
     <form id="mainForm" onsubmit="return false;">
         <div id="paso1" class="seccion active">
             <div class="grid-header">
@@ -74,83 +74,100 @@
 </div>
 
 <script>
-    function inicializarFormulario() {
-        const ahora = new Date();
-        document.getElementById('info-fecha').value = ahora.toISOString().split('T')[0];
-        document.getElementById('info-hora').value = ahora.toTimeString().split(' ')[0].substring(0, 5);
-        cargarProgreso();
+    // --- LÓGICA DE BASE DE DATOS (INDEXEDDB) PARA FOTOS ---
+    let db;
+    const request = indexedDB.open("AuditPhotosDB", 1);
+    request.onupgradeneeded = e => { e.target.result.createObjectStore("photos", { keyPath: "id" }); };
+    request.onsuccess = e => { db = e.target.result; cargarFotosGuardadas(); };
+
+    function salvarFotoDB(idItem, base64Array) {
+        const tx = db.transaction("photos", "readwrite");
+        tx.objectStore("photos").put({ id: idItem, images: base64Array });
     }
 
+    function cargarFotosGuardadas() {
+        const tx = db.transaction("photos", "readonly");
+        const store = tx.objectStore("photos");
+        store.openCursor().onsuccess = e => {
+            const cursor = e.target.result;
+            if (cursor) {
+                const { id, images } = cursor.value;
+                images.forEach(base64 => dibujarThumb(id, base64, false));
+                cursor.continue();
+            }
+        };
+    }
+
+    function borrarFotosDB() {
+        db.transaction("photos", "readwrite").objectStore("photos").clear();
+    }
+
+    // --- PREGUNTAS Y RENDER ---
     const preguntasData = [
-        {z: "MATERIA PRIMA", p: "¿No hay objetos innecesarios en la zona (herramientas, guantes, etc.) y solo se encuentra materia prima para la OP actual?"},
-        {z: "MATERIA PRIMA", p: "¿La materia prima y soporte tienen un lugar asignado y están ubicados correctamente?"},
-        {z: "MATERIA PRIMA", p: "¿El área está limpia y libre de cartones, plásticos, polvo o residuos?"},
-        {z: "MATERIA PRIMA", p: "¿Las delimitaciones y rótulos de la zona de materia prima están en buen estado?"},
-        {z: "FORMADORA", p: "¿El área está libre de objetos ajenos a la actividad(ej. cartones, plástico, escoba, trapos, herramientas,etc.)?"},
-        {z: "FORMADORA", p: "¿El depósito de merma contiene solo piezas del lote en producción?"},
-        {z: "FORMADORA", p: "¿Los elementos (encendedor, aceite, agua) tienen un lugar asignado y están ubicados correctamente?"},
-        {z: "FORMADORA", p: "¿La formadora y elementos de su entorno (ej. tacho, tablero, tuberías) están limpios, sin grasa, polvo ni residuos de vidrio?"},
-        {z: "FORMADORA", p: "¿Existen delimitaciones y rótulos en buen estado (ej. mandriles, mecheros, controles, alarmas, tuberías, tachos, etc.)?"},
-        {z: "IMPRESIÓN", p: "¿No hay materiales ajenos a la actividad propia del lugar (trapos, cartones, herramientas, etc.)?"},
-        {z: "IMPRESIÓN", p: "¿No se encuentran mezclados los productos (ej. papel higiénico, trapos, plásticos, etc.) y productos de prueba, o no conformes, en los tachos de basura?"},
-        {z: "IMPRESIÓN", p: "¿El área, piso, y tachos se encuentran limpios, libres de residuos de vidrio, polvo, manchas de pintura o grasa?"},
-        {z: "IMPRESIÓN", p: "¿La cadena, los tachos, los equipos, los botones y las señalizaciones de seguridad están claramente rotulados?"},
-        {z: "COCHE", p: "¿No se observan objetos ajenos al coche (ej. Objetos personales, afloja todo, piezas de máquina, etc.)?"},
-        {z: "COCHE", p: "¿Todos los elementos del coche (materiales, pintura, aceite, herramienta, etc.) tienen un lugar asignado?"},
-        {z: "COCHE", p: "¿El coche y su área se perciben limpios?"},
-        {z: "COCHE", p: "¿Las delimitaciones y rótulos el coche están en buen estado?"},
-        {z: "HORNO Y TABLERO", p: "¿No existen objetos innecesarios o ajenos en la zona del horno?"},
-        {z: "HORNO Y TABLERO", p: "Los elementos de la zona, piso y horno están limpios (ej. piso limpio, libre de polvo, derrames, etc.)"},
-        {z: "HORNO Y TABLERO", p: "¿Existen señales visuales (riesgo de alta temperatura, botones, horno) están visibles y en buen estado?"},
-        {z: "EMBALAJE", p: "¿No hay materiales ajenos a la actividad propia del lugar (trapos, cartones, herramientas, etc.)?"},
-        {z: "EMBALAJE", p: "Los elementos de la zona y el piso están limpios (ej. libre de residuos, polvo, grasa o manchas)"},
-        {z: "EMBALAJE", p: "¿Las partes, los elementos y las zonas de trabajo están rotuladas y en buen estado?"},
-        {z: "MESA DE REVISIÓN", p: "¿No se observan objetos ajenos a la mesa de revisión (ej. Objetos personales, piezas de máquina, etc.)?"},
-        {z: "MESA DE REVISIÓN", p: "¿Los elementos (bandejas, stickers, bandejas por revisar, revisadas) están en su lugar asignado?"},
-        {z: "MESA DE REVISIÓN", p: "La mesa y su área se perciben limpios"},
-        {z: "MESA DE REVISIÓN", p: "¿Las instalaciones (vidrio, conexiones, banco), delimitaciones y rótulos están en buen estado?"},
-        {z: "MESA DE REVISIÓN", p: "No se observan objetos innecesarios (ej. stretch film, cartones, bolsas) en el área de la parihuela"},
-        {z: "PRODUCTO TERMINADO", p: "¿El producto terminado tiene un lugar asignado y está ubicado correctamente?"},
-        {z: "PRODUCTO TERMINADO", p: "¿Cada bandeja está identificada con su sticker de datos y su tapa de acuerdo al tamaño?"},
-        {z: "PRODUCTO TERMINADO", p: "Los elementos de la zona y el piso están limpios (libre de vidrio, polvo, grasa o manchas)"},
-        {z: "PRODUCTO TERMINADO", p: "¿Las delimitaciones y rótulo de la zona y los stickers de cada bandeja están en buen estado?"},
-        {z: "LÍNEA / PERSONAL", p: "¿Se han retirado elementos innecesarios de las zonas de tránsito?"},
-        {z: "LÍNEA / PERSONAL", p: "¿Se han dispuesto artículos y herramientas por uso diario y ocasionales correctamente?"},
-        {z: "LÍNEA / PERSONAL", p: "¿Existen espacios y elementos para disponer la basura y se encuentran delimitados?"},
-        {z: "LÍNEA / PERSONAL", p: "¿El piso y las áreas comunes están limpias y libres de residuos o derrames?"},
-        {z: "LÍNEA / PERSONAL", p: "¿Los pisos están en buenas condiciones físicas, parejos, regulares, no resbaladizos?"},
-        {z: "LÍNEA / PERSONAL", p: "¿Las señales visuales y delimitaciones se mantienen uniformes en toda la línea?"},
-        {z: "LÍNEA / PERSONAL", p: "¿Usa correctamente sus EPP's (ej. zapatos, tapones auditivos, lentes y guantes)?"},
-        {z: "LÍNEA / PERSONAL", p: "¿Existen observaciones realizadas en auditorías anteriores que no han sido corregidas?"},
-        {z: "LÍNEA / PERSONAL", p: "¿Su uniforme se encuentra en buenas condiciones y es acorde al modelo vigente?"},
-        {z: "LÍNEA / PERSONAL", p: "¿El personal conoce y aplica la importancia de las 5S?"}
+        {z: "MATERIA PRIMA", p: "¿No hay objetos innecesarios en la zona (herramientas, guantes, etc.)?"},
+        {z: "MATERIA PRIMA", p: "¿La materia prima tiene un lugar asignado?"},
+        {z: "MATERIA PRIMA", p: "¿El área está limpia?"},
+        {z: "MATERIA PRIMA", p: "¿Delimitaciones en buen estado?"},
+        {z: "FORMADORA", p: "¿Área libre de objetos ajenos?"},
+        {z: "FORMADORA", p: "¿Depósito de merma correcto?"},
+        {z: "FORMADORA", p: "¿Elementos (aceite, agua) ordenados?"},
+        {z: "FORMADORA", p: "¿Formadora limpia?"},
+        {z: "FORMADORA", p: "¿Rótulos en buen estado?"},
+        {z: "IMPRESIÓN", p: "¿Sin materiales ajenos?"},
+        {z: "IMPRESIÓN", p: "¿Tachos sin mezcla de productos?"},
+        {z: "IMPRESIÓN", p: "¿Área y piso limpios?"},
+        {z: "IMPRESIÓN", p: "¿Señalizaciones claras?"},
+        {z: "COCHE", p: "¿Sin objetos ajenos?"},
+        {z: "COCHE", p: "¿Elementos ubicados correctamente?"},
+        {z: "COCHE", p: "¿Área percibida limpia?"},
+        {z: "COCHE", p: "¿Delimitaciones correctas?"},
+        {z: "HORNO", p: "¿Sin objetos innecesarios?"},
+        {z: "HORNO", p: "¿Piso y horno limpios?"},
+        {z: "HORNO", p: "¿Señales de riesgo visibles?"},
+        {z: "EMBALAJE", p: "¿Sin materiales ajenos?"},
+        {z: "EMBALAJE", p: "¿Piso limpio?"},
+        {z: "EMBALAJE", p: "¿Zonas rotuladas?"},
+        {z: "REVISIÓN", p: "¿Sin objetos ajenos?"},
+        {z: "REVISIÓN", p: "¿Elementos en su lugar?"},
+        {z: "REVISIÓN", p: "¿Mesa limpia?"},
+        {z: "REVISIÓN", p: "¿Instalaciones en buen estado?"},
+        {z: "REVISIÓN", p: "¿Sin objetos innecesarios en parihuela?"},
+        {z: "REVISIÓN", p: "¿Producto terminado ubicado?"},
+        {z: "REVISIÓN", p: "¿Bandejas con sticker?"},
+        {z: "REVISIÓN", p: "¿Área libre de vidrio?"},
+        {z: "PT", p: "¿Delimitaciones de PT correctas?"},
+        {z: "PT", p: "¿Zonas de tránsito libres?"},
+        {z: "PT", p: "¿Herramientas dispuestas?"},
+        {z: "PT", p: "¿Espacios para basura?"},
+        {z: "ALL", p: "¿Piso áreas comunes limpio?"},
+        {z: "ALL", p: "¿Pisos en buen estado?"},
+        {z: "ALL", p: "¿Señales uniformes?"},
+        {z: "ALL", p: "¿EPP's correctos?"},
+        {z: "ALL", p: "¿Observaciones corregidas?"},
+        {z: "ALL", p: "¿Uniforme correcto?"},
+        {z: "ALL", p: "¿Conoce importancia 5S?"}
     ];
 
-    function renderizarPreguntas() {
+    function renderizar() {
         const cont = document.getElementById('contenedor-preguntas');
-        cont.innerHTML = "";
-        let currentZona = "";
+        let currentZ = "";
         preguntasData.forEach((item, i) => {
             const id = i + 1;
-            if(item.z !== currentZona) {
-                const header = document.createElement('div');
-                header.className = 'zona-header'; header.innerText = item.z;
-                cont.appendChild(header);
-                currentZona = item.z;
+            if(item.z !== currentZ) {
+                const h = document.createElement('div'); h.className='zona-header'; h.innerText=item.z; cont.appendChild(h); currentZ=item.z;
             }
-            const div = document.createElement('div');
-            div.className = 'item-pregunta'; div.id = `card-${id}`;
+            const div = document.createElement('div'); div.className='item-pregunta'; div.id=`card-${id}`;
             div.innerHTML = `
                 <p><strong>${id}.</strong> ${item.p}</p>
                 <div class="opciones-respuesta">
-                    <input type="radio" name="p${id}" id="p${id}b" value="B" onclick="handleRadio(${id}, 'B')"><label class="opt-label" for="p${id}b">BUENO</label>
-                    <input type="radio" name="p${id}" id="p${id}m" value="M" onclick="handleRadio(${id}, 'M')"><label class="opt-label" for="p${id}m">MALO</label>
-                    <input type="radio" name="p${id}" id="p${id}na" value="NA" onclick="handleRadio(${id}, 'NA')"><label class="opt-label" for="p${id}na">NA</label>
+                    <input type="radio" name="p${id}" id="p${id}b" value="B" onclick="handleRadio(${id},'B')"><label class="opt-label" for="p${id}b">BUENO</label>
+                    <input type="radio" name="p${id}" id="p${id}m" value="M" onclick="handleRadio(${id},'M')"><label class="opt-label" for="p${id}m">MALO</label>
+                    <input type="radio" name="p${id}" id="p${id}na" value="NA" onclick="handleRadio(${id},'NA')"><label class="opt-label" for="p${id}na">NA</label>
                 </div>
                 <div id="nc-${id}" class="nc-box">
                     <textarea id="obs-${id}" placeholder="Describa el hallazgo..." oninput="verificarItemCompleto(${id})"></textarea>
                     <div class="gallery" id="gal-${id}"></div>
-                    <label style="background:#5f6368;color:white;padding:12px;border-radius:4px;display:block;text-align:center;margin-top:10px;font-size:0.9rem;cursor:pointer;">
+                    <label style="background:#555;color:white;padding:12px;border-radius:4px;display:block;text-align:center;margin-top:10px;font-size:0.9rem;">
                         📷 FOTO OBLIGATORIA (MÁX 3) <input type="file" accept="image/*" capture="environment" style="display:none" onchange="subirFoto(${id}, this)">
                     </label>
                 </div>`;
@@ -158,19 +175,62 @@
         });
     }
 
+    function inicializar() {
+        const ahora = new Date();
+        document.getElementById('info-fecha').value = ahora.toISOString().split('T')[0];
+        document.getElementById('info-hora').value = ahora.toTimeString().split(' ')[0].substring(0, 5);
+        renderizar();
+        cargarProgresoTexto();
+    }
+
+    // --- LÓGICA DE FOTOS ---
+    function subirFoto(id, input) {
+        const gal = document.getElementById('gal-'+id);
+        if (gal.children.length >= 3) { alert("Máximo 3 fotos."); return; }
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                dibujarThumb(id, e.target.result, true);
+                verificarItemCompleto(id);
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function dibujarThumb(idItem, base64, guardar) {
+        const div = document.createElement('div');
+        div.className = 'thumb-container'; div.dataset.base = base64;
+        div.innerHTML = `<img src="${base64}" class="thumb"><button class="btn-del" type="button" onclick="eliminarFoto(${idItem}, this)">×</button>`;
+        document.getElementById('gal-'+idItem).appendChild(div);
+        if(guardar) persistirFotosItem(idItem);
+    }
+
+    function eliminarFoto(idItem, btn) {
+        btn.parentElement.remove();
+        persistirFotosItem(idItem);
+        verificarItemCompleto(idItem);
+    }
+
+    function persistirFotosItem(idItem) {
+        const base64s = Array.from(document.getElementById('gal-'+idItem).children).map(c => c.dataset.base);
+        salvarFotoDB(idItem, base64s);
+    }
+
+    // --- NAVEGACIÓN Y VALIDACIÓN ---
     function handleRadio(id, val) {
         document.getElementById('nc-'+id).style.display = (val==='M'?'block':'none');
         verificarItemCompleto(id);
-        guardarProgreso();
+        guardarProgresoTexto();
     }
 
     function verificarItemCompleto(id) {
         const r = document.querySelector(`input[name="p${id}"]:checked`);
         const card = document.getElementById('card-'+id);
         if(!r) return;
-        let ok = (r.value !== 'M') || (document.getElementById('obs-'+id).value.trim().length >= 3 && document.getElementById('gal-'+id).children.length > 0);
+        const ok = (r.value !== 'M') || (document.getElementById('obs-'+id).value.trim().length >= 3 && document.getElementById('gal-'+id).children.length > 0);
         if(ok) card.classList.remove('error-resaltado');
-        guardarProgreso();
+        guardarProgresoTexto();
     }
 
     function irAPaso2() {
@@ -180,8 +240,8 @@
         let err = false;
         ids.forEach(id => {
             const el = document.getElementById(id);
-            let valErr = !el.value || (id==='info-op' && !opRegex.test(opVal));
-            if(valErr) { el.classList.add('error-resaltado'); err = true; }
+            if(!el.value || (id==='info-op' && !opRegex.test(opVal))) { el.classList.add('error-resaltado'); err = true; }
+            else el.classList.remove('error-resaltado');
         });
         if(err) return alert("Complete los datos. OP: 9 dígitos o NA.");
         document.getElementById('paso1').classList.remove('active');
@@ -189,126 +249,68 @@
         window.scrollTo(0,0);
     }
 
-    function subirFoto(id, input) {
-        const gal = document.getElementById('gal-'+id);
-        if (gal.children.length >= 3) {
-            alert("⚠️ BLOQUEO: Solo se permiten máximo 3 fotos por hallazgo.");
-            input.value = ""; 
-            return;
-        }
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = e => {
-                const div = document.createElement('div');
-                div.className = 'thumb-container'; div.dataset.base = e.target.result;
-                div.innerHTML = `<img src="${e.target.result}" class="thumb"><button class="btn-del" type="button" onclick="this.parentElement.remove(); verificarItemCompleto(${id});">×</button>`;
-                gal.appendChild(div);
-                verificarItemCompleto(id);
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
     function validarAuditoria() {
         let error = false; let primerErr = null;
         for(let i=1; i<=42; i++) {
-            const card = document.getElementById('card-'+i);
             const r = document.querySelector(`input[name="p${i}"]:checked`);
-            let fail = !r || (r.value==='M' && (document.getElementById('obs-'+i).value.trim().length < 3 || document.getElementById('gal-'+i).children.length === 0));
+            const fail = !r || (r.value==='M' && (document.getElementById('obs-'+i).value.trim().length < 3 || document.getElementById('gal-'+i).children.length === 0));
             if(fail) {
-                card.classList.add('error-resaltado');
-                if(!primerErr) primerErr = card;
-                error = true;
+                const card = document.getElementById('card-'+i); card.classList.add('error-resaltado');
+                if(!primerErr) primerErr = card; error = true;
             }
         }
-        if(error) { primerErr.scrollIntoView({behavior:'smooth', block:'center'}); return alert("Faltan respuestas o evidencias."); }
+        if(error) { primerErr.scrollIntoView({behavior:'smooth', block:'center'}); return alert("Faltan datos o fotos en MALO."); }
         document.getElementById('modalConfirm').style.display = 'flex';
     }
 
     async function procesarFinal(limpiar) {
         document.getElementById('modalConfirm').style.display = 'none';
         await generarExcel();
-        if(limpiar) { localStorage.removeItem('audit5S_backup'); location.reload(); }
+        if(limpiar) { localStorage.removeItem('audit5S_text'); borrarFotosDB(); location.reload(); }
     }
 
     async function generarExcel() {
         const wb = new ExcelJS.Workbook();
         const ws = wb.addWorksheet('Auditoria');
         const ahora = new Date();
-        const opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        const opc = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         
-        let cols = [
-            {header:'MARCA TEMPORAL', key:'ts', width:30},
-            {header:'FECHA AUDITORÍA', key:'f', width:15},
-            {header:'AUDITOR', key:'a', width:20},
-            {header:'LINEA', key:'l', width:10},
-            {header:'REGULADOR', key:'reg', width:20},
-            {header:'OP', key:'op', width:12}
-        ];
-        
-        // RESTRICCIÓN DE FORMATO: Item XX, Descripción XX, Evidencia XX.1, Evidencia XX.2, Evidencia XX.3
+        let cols = [{header:'MARCA TEMPORAL', key:'ts', width:30},{header:'FECHA', key:'f', width:15},{header:'AUDITOR', key:'a', width:20},{header:'LINEA', key:'l', width:10},{header:'REGULADOR', key:'reg', width:20},{header:'OP', key:'op', width:12}];
         for(let i=1; i<=42; i++) {
-            const n = i < 10 ? '0' + i : i;
-            cols.push(
-                {header:`Item ${n}`, key:`p${i}`, width:10},
-                {header:`Descripción ${n}`, key:`nc${i}`, width:25},
-                {header:`Evidencia ${n}.1`, key:`e${i}_1`, width:15},
-                {header:`Evidencia ${n}.2`, key:`e${i}_2`, width:15},
-                {header:`Evidencia ${n}.3`, key:`e${i}_3`, width:15}
-            );
+            const n = i < 10 ? '0'+i : i;
+            cols.push({header:`Item ${n}`, key:`p${i}`, width:10},{header:`Descripción ${n}`, key:`nc${i}`, width:25},{header:`Evidencia ${n}.1`, key:`e${i}_1`, width:15},{header:`Evidencia ${n}.2`, key:`e${i}_2`, width:15},{header:`Evidencia ${n}.3`, key:`e${i}_3`, width:15});
         }
         ws.columns = cols;
 
-        const info = {
-            ts: ahora.toLocaleDateString('es-ES', opcionesFecha),
-            f: document.getElementById('info-fecha').value,
-            a: document.getElementById('info-auditor').value,
-            l: document.getElementById('info-linea').value,
-            reg: document.getElementById('info-regulador').value,
-            op: document.getElementById('info-op').value.toUpperCase()
-        };
-
+        const info = { ts: ahora.toLocaleDateString('es-ES', opc), f: document.getElementById('info-fecha').value, a: document.getElementById('info-auditor').value, l: document.getElementById('info-linea').value, reg: document.getElementById('info-regulador').value, op: document.getElementById('info-op').value.toUpperCase() };
         for(let i=1; i<=42; i++) {
             const val = document.querySelector(`input[name="p${i}"]:checked`).value;
-            info[`p${i}`] = val === 'B' ? 'BUENO' : (val === 'M' ? 'MALO' : 'NA');
-            info[`nc${i}`] = val === 'M' ? document.getElementById('obs-'+i).value : '';
+            info[`p${i}`] = val; info[`nc${i}`] = val === 'M' ? document.getElementById('obs-'+i).value : '';
         }
+        const row = ws.addRow(info); row.height = 95;
 
-        const row = ws.addRow(info);
-        row.height = 95;
-
-        // Inserción de imágenes en sus columnas específicas (Evidencia X.1, X.2, X.3)
         for(let i=1; i<=42; i++) {
-            const gal = document.getElementById('gal-'+i);
-            const thumbs = gal.children;
+            const thumbs = document.getElementById('gal-'+i).children;
             for(let f = 0; f < thumbs.length; f++) {
-                const imgData = thumbs[f].dataset.base;
-                const imgId = wb.addImage({ base64: imgData, extension: 'png' });
-                
-                // Columna de inicio: 6 de cabecera + (i-1)*5 del bloque + 2 para llegar a Evidencia .1
-                const colIdx = 6 + (i-1)*5 + 2 + f;
-                
-                ws.addImage(imgId, {
-                    tl: { col: colIdx, row: 1 },
-                    ext: { width: 110, height: 115 }
-                });
+                const imgId = wb.addImage({ base64: thumbs[f].dataset.base, extension: 'png' });
+                ws.addImage(imgId, { tl: { col: 6+(i-1)*5+2+f, row: row.number-1 }, ext: { width: 110, height: 115 } });
             }
         }
-
         const buf = await wb.xlsx.writeBuffer();
-        saveAs(new Blob([buf]), `Audit_${info.l}_${document.getElementById('info-fecha').value}.xlsx`);
+        saveAs(new Blob([buf]), `Audit_${info.l}.xlsx`);
     }
 
-    function quitarError(el) { if(el.value.trim() !== "") el.classList.remove('error-resaltado'); guardarProgreso(); }
-    function guardarProgreso() {
+    function quitarError(el) { el.classList.remove('error-resaltado'); guardarProgresoTexto(); }
+    
+    function guardarProgresoTexto() {
         const data = {};
         document.querySelectorAll('input[type="text"], select, input[type="date"], input[type="time"], textarea').forEach(el => data[el.id] = el.value);
         document.querySelectorAll('input[type="radio"]:checked').forEach(el => data[el.name] = el.value);
-        localStorage.setItem('audit5S_backup', JSON.stringify(data));
+        localStorage.setItem('audit5S_text', JSON.stringify(data));
     }
-    function cargarProgreso() {
-        renderizarPreguntas();
-        const raw = localStorage.getItem('audit5S_backup');
+
+    function cargarProgresoTexto() {
+        const raw = localStorage.getItem('audit5S_text');
         if(!raw) return;
         const data = JSON.parse(raw);
         for(let key in data) {
