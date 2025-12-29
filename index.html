@@ -31,17 +31,17 @@
         .thumb-container { position: relative; width: 80px; height: 80px; }
         .thumb { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; border: 1px solid #ccc; }
         .btn-del { position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; width: 22px; height: 22px; border: none; cursor: pointer; }
-        .btn-blue { background: var(--primary); color: white; border: none; padding: 18px; width: 100%; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .btn-blue { background: var(--primary); color: white; border: none; padding: 18px; width: 100%; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 20px; -webkit-appearance: none; }
         #modalConfirm { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center; }
         .modal-content { background:white; padding:20px; border-radius:8px; width:90%; max-width:400px; text-align:center; }
     </style>
 </head>
-<body onload="cargarProgreso()">
+<body onload="inicializarFormulario()">
 
 <div id="modalConfirm">
     <div class="modal-content">
-        <h3>Auditoría Lista</h3>
-        <p>¿Qué desea hacer con los datos?</p>
+        <h3>Auditoría Finalizada</h3>
+        <p>¿Qué desea hacer con los datos actuales?</p>
         <button class="btn-blue" onclick="procesarFinal(true)">DESCARGAR Y LIMPIAR TODO</button>
         <button class="btn-blue" style="background:#607d8b" onclick="procesarFinal(false)">SOLO DESCARGAR EXCEL</button>
     </div>
@@ -52,7 +52,7 @@
     <form id="mainForm" onsubmit="return false;">
         <div id="paso1" class="seccion active">
             <div class="grid-header">
-                <div class="field"><label>AUDITOR * (selecciona tu nombre)</label><select id="info-auditor" onchange="quitarError(this)"><option value="">Seleccione...</option><option>Manuel Yucra</option><option>Bladimir Palacios</option><option>Christian Vargas</option><option>Sandra Diaz</option><option>Edwin Mariano</option><option>Stephanie Quispe</option><option>Henry Eulogio</option><option>Jerol Rojas</option><option>Eduar Monsalve</option><option>Victor Paredes</option><option>Julio More</option></select></div>
+                <div class="field"><label>AUDITOR *</label><select id="info-auditor" onchange="quitarError(this)"><option value="">Seleccione...</option><option>Manuel Yucra</option><option>Bladimir Palacios</option><option>Christian Vargas</option><option>Sandra Diaz</option><option>Edwin Mariano</option><option>Stephanie Quispe</option><option>Henry Eulogio</option><option>Jerol Rojas</option><option>Eduar Monsalve</option><option>Victor Paredes</option><option>Julio More</option></select></div>
                 <div class="field"><label>FECHA *</label><input type="date" id="info-fecha" onchange="quitarError(this)"></div>
                 <div class="field"><label>HORA *</label><input type="time" id="info-hora" onchange="quitarError(this)"></div>
                 <div class="field"><label>LÍNEA *</label><select id="info-linea" onchange="quitarError(this)"><option value="">Seleccione...</option><option>MA-01</option><option>MA-02</option><option>MA-03</option><option>MA-04</option><option>MA-05</option><option>MA-06</option><option>MA-08</option><option>MA-09</option><option>MA-10</option><option>FV-01</option><option>FV-03</option><option>FV-04</option><option>FV-05</option><option>FV-06</option></select></div>
@@ -68,12 +68,19 @@
 
         <div id="paso2" class="seccion">
             <div id="contenedor-preguntas"></div>
-            <button type="button" class="btn-blue" style="background:var(--success)" onclick="validarAuditoria()">FINALIZAR Y DESCARGAR</button>
+            <button type="button" id="btnFinalizar" class="btn-blue" style="background:var(--success)" onclick="validarAuditoria()">FINALIZAR Y DESCARGAR</button>
         </div>
     </form>
 </div>
 
 <script>
+    function inicializarFormulario() {
+        const ahora = new Date();
+        document.getElementById('info-fecha').value = ahora.toISOString().split('T')[0];
+        document.getElementById('info-hora').value = ahora.toTimeString().split(' ')[0].substring(0, 5);
+        cargarProgreso();
+    }
+
     const preguntasData = [
         {z: "MATERIA PRIMA", p: "¿No hay objetos innecesarios en la zona (herramientas, guantes, etc.) y solo se encuentra materia prima para la OP actual?"},
         {z: "MATERIA PRIMA", p: "¿La materia prima y soporte tienen un lugar asignado y están ubicados correctamente?"},
@@ -107,20 +114,21 @@
         {z: "PRODUCTO TERMINADO", p: "¿Cada bandeja está identificada con su sticker de datos y su tapa de acuerdo al tamaño?"},
         {z: "PRODUCTO TERMINADO", p: "Los elementos de la zona y el piso están limpios (libre de vidrio, polvo, grasa o manchas)"},
         {z: "PRODUCTO TERMINADO", p: "¿Las delimitaciones y rótulo de la zona y los stickers de cada bandeja están en buen estado?"},
-        {z: "PERSONAL Y LÍNEA", p: "¿Se han retirado elementos innecesarios de las zonas de tránsito?"},
-        {z: "PERSONAL Y LÍNEA", p: "¿Se han dispuesto artículos y herramientas por uso diario y ocasionales correctamente?"},
-        {z: "PERSONAL y LÍNEA", p: "¿Existen espacios y elementos para disponer la basura y se encuentran delimitados?"},
-        {z: "PERSONAL y LÍNEA", p: "¿El piso y las áreas comunes están limpias y libres de residuos o derrames?"},
-        {z: "PERSONAL y LÍNEA", p: "¿Los pisos están en buenas condiciones físicas, parejos, regulares, no resbaladizos?"},
-        {z: "PERSONAL y LÍNEA", p: "¿Las señales visuales y delimitaciones se mantienen uniformes en toda la línea?"},
-        {z: "PERSONAL y LÍNEA", p: "¿Usa correctamente sus EPP's (ej. zapatos, tapones auditivos, lentes y guantes)?"},
-        {z: "PERSONAL y LÍNEA", p: "¿Existen observaciones realizadas en auditorías anteriores que no han sido corregidas?"},
-        {z: "PERSONAL y LÍNEA", p: "¿Su uniforme se encuentra en buenas condiciones y es acorde al modelo vigente?"},
-        {z: "PERSONAL y LÍNEA", p: "¿El personal conoce y aplica la importancia de las 5S?"}
+        {z: "LÍNEA / PERSONAL", p: "¿Se han retirado elementos innecesarios de las zonas de tránsito?"},
+        {z: "LÍNEA / PERSONAL", p: "¿Se han dispuesto artículos y herramientas por uso diario y ocasionales correctamente?"},
+        {z: "LÍNEA / PERSONAL", p: "¿Existen espacios y elementos para disponer la basura y se encuentran delimitados?"},
+        {z: "LÍNEA / PERSONAL", p: "¿El piso y las áreas comunes están limpias y libres de residuos o derrames?"},
+        {z: "LÍNEA / PERSONAL", p: "¿Los pisos están en buenas condiciones físicas, parejos, regulares, no resbaladizos?"},
+        {z: "LÍNEA / PERSONAL", p: "¿Las señales visuales y delimitaciones se mantienen uniformes en toda la línea?"},
+        {z: "LÍNEA / PERSONAL", p: "¿Usa correctamente sus EPP's (ej. zapatos, tapones auditivos, lentes y guantes)?"},
+        {z: "LÍNEA / PERSONAL", p: "¿Existen observaciones realizadas en auditorías anteriores que no han sido corregidas?"},
+        {z: "LÍNEA / PERSONAL", p: "¿Su uniforme se encuentra en buenas condiciones y es acorde al modelo vigente?"},
+        {z: "LÍNEA / PERSONAL", p: "¿El personal conoce y aplica la importancia de las 5S?"}
     ];
 
     function renderizarPreguntas() {
         const cont = document.getElementById('contenedor-preguntas');
+        cont.innerHTML = "";
         let currentZona = "";
         preguntasData.forEach((item, i) => {
             const id = i + 1;
@@ -142,7 +150,7 @@
                 <div id="nc-${id}" class="nc-box">
                     <textarea id="obs-${id}" placeholder="Describa el hallazgo..." oninput="verificarItemCompleto(${id})"></textarea>
                     <div class="gallery" id="gal-${id}"></div>
-                    <label style="background:#5f6368;color:white;padding:12px;border-radius:4px;display:block;text-align:center;margin-top:10px;font-size:0.9rem;">
+                    <label style="background:#5f6368;color:white;padding:12px;border-radius:4px;display:block;text-align:center;margin-top:10px;font-size:0.9rem;cursor:pointer;">
                         📷 FOTO OBLIGATORIA (MÁX 3) <input type="file" accept="image/*" capture="environment" style="display:none" onchange="subirFoto(${id}, this)">
                     </label>
                 </div>`;
@@ -183,14 +191,11 @@
 
     function subirFoto(id, input) {
         const gal = document.getElementById('gal-'+id);
-        
-        // RESTRICCIÓN: Límite máximo de 3 fotos
         if (gal.children.length >= 3) {
-            alert("Límite alcanzado: Máximo 3 fotos por ítem.");
-            input.value = ""; // Limpiar input
+            alert("⚠️ BLOQUEO: Solo se permiten máximo 3 fotos por hallazgo.");
+            input.value = ""; 
             return;
         }
-
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = e => {
@@ -207,16 +212,16 @@
     function validarAuditoria() {
         let error = false; let primerErr = null;
         for(let i=1; i<=42; i++) {
+            const card = document.getElementById('card-'+i);
             const r = document.querySelector(`input[name="p${i}"]:checked`);
-            const fail = !r || (r.value==='M' && (document.getElementById('obs-'+i).value.trim().length < 3 || document.getElementById('gal-'+i).children.length === 0));
+            let fail = !r || (r.value==='M' && (document.getElementById('obs-'+i).value.trim().length < 3 || document.getElementById('gal-'+i).children.length === 0));
             if(fail) {
-                const card = document.getElementById('card-'+i);
                 card.classList.add('error-resaltado');
                 if(!primerErr) primerErr = card;
                 error = true;
             }
         }
-        if(error) { primerErr.scrollIntoView({behavior:'smooth', block:'center'}); return alert("Faltan respuestas o evidencias (fotos/hallazgos)."); }
+        if(error) { primerErr.scrollIntoView({behavior:'smooth', block:'center'}); return alert("Faltan respuestas o evidencias."); }
         document.getElementById('modalConfirm').style.display = 'flex';
     }
 
@@ -229,31 +234,72 @@
     async function generarExcel() {
         const wb = new ExcelJS.Workbook();
         const ws = wb.addWorksheet('Auditoria');
-        let cols = [{header:'FECHA',key:'f',width:12},{header:'AUDITOR',key:'a',width:20},{header:'LINEA',key:'l',width:10},{header:'REGULADOR',key:'reg',width:15},{header:'OP',key:'op',width:12}];
+        const ahora = new Date();
+        const opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        
+        let cols = [
+            {header:'MARCA TEMPORAL', key:'ts', width:30},
+            {header:'FECHA AUDITORÍA', key:'f', width:15},
+            {header:'AUDITOR', key:'a', width:20},
+            {header:'LINEA', key:'l', width:10},
+            {header:'REGULADOR', key:'reg', width:20},
+            {header:'OP', key:'op', width:12}
+        ];
+        
+        // RESTRICCIÓN DE FORMATO: Item XX, Descripción XX, Evidencia XX.1, Evidencia XX.2, Evidencia XX.3
         for(let i=1; i<=42; i++) {
-            cols.push({header:`P${i}`, key:`p${i}`, width:8}, {header:`HALLAZGO${i}`, key:`nc${i}`, width:25}, {header:`IMG${i}`, key:`img${i}`, width:15});
+            const n = i < 10 ? '0' + i : i;
+            cols.push(
+                {header:`Item ${n}`, key:`p${i}`, width:10},
+                {header:`Descripción ${n}`, key:`nc${i}`, width:25},
+                {header:`Evidencia ${n}.1`, key:`e${i}_1`, width:15},
+                {header:`Evidencia ${n}.2`, key:`e${i}_2`, width:15},
+                {header:`Evidencia ${n}.3`, key:`e${i}_3`, width:15}
+            );
         }
         ws.columns = cols;
-        const info = { f: document.getElementById('info-fecha').value, a: document.getElementById('info-auditor').value, l: document.getElementById('info-linea').value, reg: document.getElementById('info-regulador').value, op: document.getElementById('info-op').value.toUpperCase() };
+
+        const info = {
+            ts: ahora.toLocaleDateString('es-ES', opcionesFecha),
+            f: document.getElementById('info-fecha').value,
+            a: document.getElementById('info-auditor').value,
+            l: document.getElementById('info-linea').value,
+            reg: document.getElementById('info-regulador').value,
+            op: document.getElementById('info-op').value.toUpperCase()
+        };
+
         for(let i=1; i<=42; i++) {
             const val = document.querySelector(`input[name="p${i}"]:checked`).value;
-            info[`p${i}`] = val;
+            info[`p${i}`] = val === 'B' ? 'BUENO' : (val === 'M' ? 'MALO' : 'NA');
             info[`nc${i}`] = val === 'M' ? document.getElementById('obs-'+i).value : '';
         }
-        const row = ws.addRow(info); row.height = 90;
+
+        const row = ws.addRow(info);
+        row.height = 95;
+
+        // Inserción de imágenes en sus columnas específicas (Evidencia X.1, X.2, X.3)
         for(let i=1; i<=42; i++) {
             const gal = document.getElementById('gal-'+i);
-            if(gal.children.length > 0) {
-                const imgId = wb.addImage({ base64: gal.children[0].dataset.base, extension: 'png' });
-                const colIdx = 5 + (i-1)*3 + 2; 
-                ws.addImage(imgId, { tl: { col: colIdx, row: 1 }, ext: { width: 110, height: 110 } });
+            const thumbs = gal.children;
+            for(let f = 0; f < thumbs.length; f++) {
+                const imgData = thumbs[f].dataset.base;
+                const imgId = wb.addImage({ base64: imgData, extension: 'png' });
+                
+                // Columna de inicio: 6 de cabecera + (i-1)*5 del bloque + 2 para llegar a Evidencia .1
+                const colIdx = 6 + (i-1)*5 + 2 + f;
+                
+                ws.addImage(imgId, {
+                    tl: { col: colIdx, row: 1 },
+                    ext: { width: 110, height: 115 }
+                });
             }
         }
+
         const buf = await wb.xlsx.writeBuffer();
-        saveAs(new Blob([buf]), `Audit_${info.l}_${info.f}.xlsx`);
+        saveAs(new Blob([buf]), `Audit_${info.l}_${document.getElementById('info-fecha').value}.xlsx`);
     }
 
-    function quitarError(el) { el.classList.remove('error-resaltado'); guardarProgreso(); }
+    function quitarError(el) { if(el.value.trim() !== "") el.classList.remove('error-resaltado'); guardarProgreso(); }
     function guardarProgreso() {
         const data = {};
         document.querySelectorAll('input[type="text"], select, input[type="date"], input[type="time"], textarea').forEach(el => data[el.id] = el.value);
