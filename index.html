@@ -2,13 +2,13 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AUDITORÍAS 5S - AMFA VITRUM</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         :root { --primary: #1a73e8; --danger: #d93025; --success: #1e8e3e; --na: #5f6368; --bg: #f8f9fa; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg); margin: 0; padding: 10px; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg); margin: 0; padding: 10px; }
         .container { max-width: 900px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin: auto; }
         .header-title { text-align: center; padding: 15px; border-bottom: 2px solid #e8f0fe; color: var(--primary); margin: 0; }
         .seccion { display: none; padding: 20px; }
@@ -16,7 +16,7 @@
         .grid-header { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; background: #fdfdfd; padding: 15px; border-radius: 8px; border: 1px solid #eee; }
         .field { display: flex; flex-direction: column; margin-bottom: 10px; }
         label { font-size: 0.8rem; font-weight: bold; color: #5f6368; margin-bottom: 5px; text-transform: uppercase; }
-        input, select, textarea { padding: 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 16px; width: 100%; box-sizing: border-box; -webkit-appearance: none; }
+        input, select, textarea { padding: 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 16px; width: 100%; box-sizing: border-box; }
         .zona-header { background: #34495e; color: white; padding: 12px 15px; font-weight: bold; text-transform: uppercase; margin-top: 20px; border-radius: 4px; }
         .item-pregunta { padding: 15px; border-bottom: 1px solid #f1f3f4; background: white; border: 2px solid transparent; border-radius: 8px; margin-bottom: 5px; }
         .error-resaltado { border: 3px dashed var(--danger) !important; background: #fff8f8 !important; }
@@ -31,7 +31,7 @@
         .thumb-container { position: relative; width: 80px; height: 80px; }
         .thumb { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; border: 1px solid #ccc; }
         .btn-del { position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; width: 22px; height: 22px; border: none; cursor: pointer; }
-        .btn-blue { background: var(--primary); color: white; border: none; padding: 18px; width: 100%; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 20px; -webkit-appearance: none; }
+        .btn-blue { background: var(--primary); color: white; border: none; padding: 18px; width: 100%; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 20px; }
         #modalConfirm { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center; }
         .modal-content { background:white; padding:20px; border-radius:8px; width:90%; max-width:400px; text-align:center; }
     </style>
@@ -84,49 +84,40 @@
         {z: "MATERIA PRIMA", p: "¿La materia prima y soporte tienen un lugar asignado y están ubicados correctemente?"},
         {z: "MATERIA PRIMA", p: "¿El área está limpia y libre de cartones, plásticos, polvo o residuos?"},
         {z: "MATERIA PRIMA", p: "¿Las delimitaciones y rótulos de la zona de materia prima están en buen estado?"},
-        
         {z: "FORMADORA", p: "¿El área está libre de objetos ajenos a la actividad(ej. cartones, plástico, escoba, trapos, herramientas,etc.) ?"},
         {z: "FORMADORA", p: "¿El depósito de merma contiene solo piezas del lote en producción?"},
         {z: "FORMADORA", p: "¿Los elementos (encendedor, aceite, agua) tienen un lugar asigando y estan ubicados correctamente?"},
         {z: "FORMADORA", p: "¿La formadora y elementos de su entorno (ej, tacho, tablero, tuberías) están limpios, sin grasa, polvo ni residuos de vidrio?"},
         {z: "FORMADORA", p: "¿Existen delimitaciones y rotulos en (ejm.mandriles, mecheros, controles, alarmas, tuberías, sistemas de seguridad, tachos, etc) y estan en buen estado?"},
-        
         {z: "CADENA DE TRANSPORTE 1 Y ZONA DE IMPRESION", p: "¿No hay materiales ajenos a la actividad propia del lugar (trapos, cartones, herramientas, etc.)?"},
         {z: "CADENA DE TRANSPORTE 1 Y ZONA DE IMPRESION", p: "¿No se encuentran mezclados los productos (ej. papel higiénico, trapos, plásticos, etc.) y productos de prueba, o no conformes, en los tachos de basura y estos se encuentran dentro de su zona delimitada?"},
         {z: "CADENA DE TRANSPORTE 1 Y ZONA DE IMPRESION", p: "¿El área, piso, y tachos se encuentran limpios, libres de residuos de vidrio, polvo, manchas de pintura o grasa, trapos, papel higiénico u otros desechos?"},
         {z: "CADENA DE TRANSPORTE 1 Y ZONA DE IMPRESION", p: "¿La cadena, los tachos, los equipos, los botones y las señalizaciones de seguridad están claramente rotulados y en buen estado, al igual que la delimitación en el piso de los tachos?"},
-        
         {z: "COCHE", p: "¿No se observan objetos ajenos al coche (ej. Objetos personales, afloja todo, piezas de máquina, etc.)?"},
         {z: "COCHE", p: "¿Todos los elementos del coche (materiales, pintura, aceite, herramienta, etc) tienen un lugar asignado y están ubicados correctamente?"},
         {z: "COCHE", p: "¿El coche y su área se perciben limpios?"},
         {z: "COCHE", p: "¿Las delimitaciones y rótulos el coche están en buen estado?"},
-        
         {z: "HORNO Y TABLERO", p: "¿No existen objetos innecesarios o ajenos en la zona del horno?"},
         {z: "HORNO Y TABLERO", p: "Los elementos de la zona, piso y horno están limpios (ej. piso limpio, libre de polvo, derrames, exceso de fibra de vidrio y/o aceite)"},
         {z: "HORNO Y TABLERO", p: "¿Existen señales visuales (riesgo de alta temperatura, botones del tablero, horno) están visibles, colocadas en sus lugares respectivo y en buen estado?"},
-        
         {z: "CADENA DE TRANSPORTE 2 Y ZONA DE RANGUEO O EMBALAJE", p: "¿No hay materiales ajenos a la actividad propia del lugar (trapos, cartones, herramientas, etc.)?"},
         {z: "CADENA DE TRANSPORTE 2 Y ZONA DE RANGUEO O EMBALAJE", p: "Los elementos de la zona y el piso están limpios (ej. libre de residuos de vidrio, polvo, grasa y/o manchas de pintura)"},
         {z: "CADENA DE TRANSPORTE 2 Y ZONA DE RANGUEO O EMBALAJE", p: "¿Las partes, los elementos y las zonas de trabajo (incluidas las de cada rango o de embalaje, según corresponda) están rotuladas y en buen estado? (Ej.: cadena de transporte 2, ventilador 2, etc.)"},
-        
         {z: "MESA DE REVISIÓN", p: "¿No se observan objetos ajenos a la mesa de revisión (ej. Objetos personales, piezas de máquina, etc.)?"},
         {z: "MESA DE REVISIÓN", p: "¿Los elementos (bandejas, stickers, bandejas por revisar, badejas revisadas) están ubicados en su lugar asignado?"},
         {z: "MESA DE REVISIÓN", p: "La mesa y su área se perciben limpios"},
         {z: "MESA DE REVISIÓN", p: "¿La instalaciones (vidrio, conexiones electricas, banco, etc), delimitaciones y rótulos se encuentran en buen estado?"},
-        
         {z: "ZONA DE PRODUCTO TERMINADO", p: "No se observan objetos innecesarios (ej. stretch film, cartones, bolsas, etc.) en el área de la parihuela y solo lo ocupa un tipo de producto"},
         {z: "ZONA DE PRODUCTO TERMINADO", p: "¿El producto terminado tiene un lugar asignado y está ubicado correctemente ?"},
         {z: "ZONA DE PRODUCTO TERMINADO", p: "¿Cada bandeja esta identificada con su sticker de datos del producto y su tapa de acuerdo al tamaño?"},
         {z: "ZONA DE PRODUCTO TERMINADO", p: "Los elementos de la zona y el piso están limpios (ej. libre de residuos de vidrio, polvo, grasa y/o manchas de pintura)"},
         {z: "ZONA DE PRODUCTO TERMINADO", p: "¿Las delimitacion y rotulo de la zona y los stickers de cada banadejas estan en buen estado?"},
-        
         {z: "TODA LA LÍNEA Y ENTORNO", p: "¿Se han retirado elementos innecesarios de las zonas de tránsito?"},
         {z: "TODA LA LÍNEA Y ENTORNO", p: "¿Se han dispuesto articulos y herramientas por uso diario y ocasionales (ej, tachos, escobas, recogedor, ventiladores de pie, etc.)?"},
         {z: "TODA LA LÍNEA Y ENTORNO", p: "¿Existen espacios y elementos para disponer la basura y se encuentran delimitados?"},
         {z: "TODA LA LÍNEA Y ENTORNO", p: "¿El piso y las áreas comunes están limpias y libres de residuos o derrames?"},
         {z: "TODA LA LÍNEA Y ENTORNO", p: "¿Los pisos están en buenas condiciones físicas, parejos, regulares, no resbaladizos, sin rajaduras, etc.?"},
         {z: "TODA LA LÍNEA Y ENTORNO", p: "¿Las señales visuales y delimitaciones se mantienen uniformes en toda la línea?"},
-        
         {z: "PERSONAL", p: "¿Usa correctamente sus EPP's (ej. zapatos, tapones auditivos, lentes y guantes según su actividad)?"},
         {z: "PERSONAL", p: "¿Existen observaciones realizadas en auditorias anteriores que no han sido corregidas o que se repiten?"},
         {z: "PERSONAL", p: "¿Su uniforme se encuentra en buenas condiciones y es acorde al modelo vigente?"},
@@ -276,29 +267,67 @@
         const ahora = new Date();
         const opc = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         
-        let cols = [{header:'MARCA TEMPORAL', key:'ts', width:30},{header:'FECHA', key:'f', width:15},{header:'AUDITOR', key:'a', width:20},{header:'LINEA', key:'l', width:10},{header:'REGULADOR', key:'reg', width:20},{header:'OP', key:'op', width:12}];
+        let cols = [
+            {header:'MARCA TEMPORAL', key:'ts', width:30},
+            {header:'FECHA', key:'f', width:15},
+            {header:'AUDITOR', key:'a', width:20},
+            {header:'LÍNEA', key:'l', width:10},
+            {header:'REGULADOR', key:'reg', width:20},
+            {header:'OPERADOR', key:'ope', width:20},      
+            {header:'VERIFICADOR', key:'ver', width:20},   
+            {header:'ESTADO', key:'est', width:15},        
+            {header:'OP', key:'op', width:12},
+            {header:'LOTE', key:'lote', width:12}          
+        ];
+
         for(let i=1; i<=preguntasData.length; i++) {
             const n = i < 10 ? '0'+i : i;
-            cols.push({header:`Item ${n}`, key:`p${i}`, width:10},{header:`Descripción ${n}`, key:`nc${i}`, width:25},{header:`Evidencia ${n}.1`, key:`e${i}_1`, width:15},{header:`Evidencia ${n}.2`, key:`e${i}_2`, width:15},{header:`Evidencia ${n}.3`, key:`e${i}_3`, width:15});
+            cols.push(
+                {header:`Item ${n}`, key:`p${i}`, width:10},
+                {header:`Descripción ${n}`, key:`nc${i}`, width:25},
+                {header:`Evidencia ${n}.1`, key:`e${i}_1`, width:15},
+                {header:`Evidencia ${n}.2`, key:`e${i}_2`, width:15},
+                {header:`Evidencia ${n}.3`, key:`e${i}_3`, width:15}
+            );
         }
         ws.columns = cols;
 
-        const info = { ts: ahora.toLocaleDateString('es-ES', opc), f: document.getElementById('info-fecha').value, a: document.getElementById('info-auditor').value, l: document.getElementById('info-linea').value, reg: document.getElementById('info-regulador').value, op: document.getElementById('info-op').value.toUpperCase() };
+        const info = { 
+            ts: ahora.toLocaleDateString('es-ES', opc), 
+            f: document.getElementById('info-fecha').value, 
+            a: document.getElementById('info-auditor').value, 
+            l: document.getElementById('info-linea').value, 
+            reg: document.getElementById('info-regulador').value,
+            ope: document.getElementById('info-operador').value.toUpperCase(),
+            ver: document.getElementById('info-verificador').value.toUpperCase(),
+            est: document.getElementById('info-estado').value,                   
+            op: document.getElementById('info-op').value.toUpperCase(),
+            lote: document.getElementById('info-lote').value.toUpperCase()        
+        };
+
         for(let i=1; i<=preguntasData.length; i++) {
-            const val = document.querySelector(`input[name="p${i}"]:checked`).value;
-            info[`p${i}`] = val; info[`nc${i}`] = val === 'M' ? document.getElementById('obs-'+i).value : '';
+            const r = document.querySelector(`input[name="p${i}"]:checked`);
+            const val = r ? r.value : '';
+            info[`p${i}`] = val; 
+            info[`nc${i}`] = val === 'M' ? document.getElementById('obs-'+i).value : '';
         }
-        const row = ws.addRow(info); row.height = 95;
+
+        const row = ws.addRow(info); 
+        row.height = 95;
 
         for(let i=1; i<=preguntasData.length; i++) {
             const thumbs = document.getElementById('gal-'+i).children;
             for(let f = 0; f < thumbs.length; f++) {
                 const imgId = wb.addImage({ base64: thumbs[f].dataset.base, extension: 'png' });
-                ws.addImage(imgId, { tl: { col: 6+(i-1)*5+2+f, row: row.number-1 }, ext: { width: 110, height: 115 } });
+                ws.addImage(imgId, { 
+                    tl: { col: 10 + (i-1)*5 + 2 + f, row: row.number-1 }, 
+                    ext: { width: 110, height: 115 } 
+                });
             }
         }
+
         const buf = await wb.xlsx.writeBuffer();
-        saveAs(new Blob([buf]), `Audit_${info.l}.xlsx`);
+        saveAs(new Blob([buf]), `Audit_${info.l}_${info.op}.xlsx`);
     }
 
     function quitarError(el) { el.classList.remove('error-resaltado'); guardarProgresoTexto(); }
@@ -318,7 +347,14 @@
             const el = document.getElementById(key);
             if(el) el.value = data[key];
             const rb = document.querySelector(`input[name="${key}"][value="${data[key]}"]`);
-            if(rb) { rb.checked = true; if(data[key]==='M') document.getElementById('nc-'+key.replace('p','')).style.display = 'block'; }
+            if(rb) { 
+                rb.checked = true; 
+                if(data[key]==='M') {
+                    const idNum = key.replace('p','');
+                    const ncBox = document.getElementById('nc-'+idNum);
+                    if(ncBox) ncBox.style.display = 'block';
+                } 
+            }
         }
     }
 </script>
