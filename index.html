@@ -285,9 +285,9 @@
             cols.push(
                 {header:`Item ${n}`, key:`p${i}`, width:10},
                 {header:`Descripción ${n}`, key:`nc${i}`, width:25},
-                {header:`Evidencia ${n}.1`, key:`e${i}_1`, width:15},
-                {header:`Evidencia ${n}.2`, key:`e${i}_2`, width:15},
-                {header:`Evidencia ${n}.3`, key:`e${i}_3`, width:15}
+                {header:`Evidencia ${n}.1`, key:`e${i}_1`, width:20},
+                {header:`Evidencia ${n}.2`, key:`e${i}_2`, width:20},
+                {header:`Evidencia ${n}.3`, key:`e${i}_3`, width:20}
             );
         }
         ws.columns = cols;
@@ -313,15 +313,23 @@
         }
 
         const row = ws.addRow(info); 
-        row.height = 95;
+        row.height = 110; 
+
+        // CONFIGURACIÓN DE MARGEN (EMUs)
+        // 200,000 EMUs es aproximadamente 21 píxeles de margen.
+        const padding = 200000; 
 
         for(let i=1; i<=preguntasData.length; i++) {
             const thumbs = document.getElementById('gal-'+i).children;
+            const startCol = 10 + (i-1)*5 + 2; 
+
             for(let f = 0; f < thumbs.length; f++) {
                 const imgId = wb.addImage({ base64: thumbs[f].dataset.base, extension: 'png' });
+                
                 ws.addImage(imgId, { 
-                    tl: { col: 10 + (i-1)*5 + 2 + f, row: row.number-1 }, 
-                    ext: { width: 110, height: 115 } 
+                    tl: { col: startCol + f, row: row.number - 1, nativeColOff: padding, nativeRowOff: padding }, 
+                    br: { col: startCol + f + 1, row: row.number, nativeColOff: -padding, nativeRowOff: -padding },
+                    editAs: 'oneCell'
                 });
             }
         }
