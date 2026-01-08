@@ -54,9 +54,9 @@
             <div class="grid-header">
                 <div class="field"><label>AUDITOR *</label><select id="info-auditor" onchange="quitarError(this)"><option value="">Seleccione...</option><option>Manuel Yucra</option><option>Bladimir Palacios</option><option>Christian Vargas</option><option>Sandra Diaz</option><option>Edwin Mariano</option><option>Stephanie Quispe</option><option>Henry Eulogio</option><option>Jerol Rojas</option><option>Eduar Monsalve</option><option>Victor Paredes</option><option>Julio More</option></select></div>
                 <div class="field"><label>FECHA *</label><input type="date" id="info-fecha" onchange="quitarError(this)"></div>
-                <div class="field"><label>HORA *</label><input type="time" id="info-hora" onchange="quitarError(this)"></div>
+                <div class="field"><label>HORA INICIO *</label><input type="time" id="info-hora" onchange="quitarError(this)"></div>
                 <div class="field"><label>LÍNEA *</label><select id="info-linea" onchange="quitarError(this)"><option value="">Seleccione...</option><option>MA-01</option><option>MA-02</option><option>MA-03</option><option>MA-04</option><option>MA-05</option><option>MA-06</option><option>MA-08</option><option>MA-09</option><option>MA-10</option><option>FV-01</option><option>FV-03</option><option>FV-04</option><option>FV-05</option><option>FV-06</option></select></div>
-                <div class="field"><label>REGULADOR *</label><select id="info-regulador" onchange="quitarError(this)"><option value="">Seleccione...</option><option value="NA">NA</option><option>Julian Flores</option><option>Armando Bernaola</option><option>Milton Garcia</option><option>German Guzman</option><option>Alexis Lopez</option><option>Antonio Martinez</option><option>Luis Fernandez</option><option>Angel Sanchez</option><option>Roberto Amasifuen</option><option>Roberto Espinoza</option><option>Max Fatama</option></select></div>
+                <div class="field"><label>REGULADOR *</label><select id="info-regulador" onchange="quitarError(this)"><option value="">Seleccione...</option><option value="NA">NA</option><option>JULIAN FLORES</option><option>ARMANDO BERNAOLA</option><option>MILTON GARCIA</option><option>GERMAN GUZMAN</option><option>ALEXIS LOPEZ</option><option>ANTONIO MARTINEZ</option><option>LUIS FERNANDEZ</option><option>AANGEL SANCHEZ</option><option>ROBERTO AMASIFUEN</option><option>ROBERTO ESPINOZA</option><option>MAX FATAMA</option></select></div>
                 <div class="field"><label>OPERADOR *</label><input type="text" id="info-operador" placeholder="o NA" oninput="quitarError(this)"></div>
                 <div class="field"><label>VERIFICADOR *</label><input type="text" id="info-verificador" placeholder="o NA" oninput="quitarError(this)"></div>
                 <div class="field"><label>ESTADO *</label><select id="info-estado" onchange="quitarError(this)"><option value="">Seleccione...</option><option>EN OPERACION</option><option>EN PREPARACION</option><option>INHABILITADA</option></select></div>
@@ -258,14 +258,11 @@
         document.getElementById('modalConfirm').style.display = 'none';
         await generarExcel();
         if(limpiar) {
-            // LIMPIEZA PROFUNDA
             localStorage.removeItem('audit5S_text');
             borrarFotosDB();
-            // Limpiar visualmente antes de recargar
             document.getElementById('mainForm').reset();
-            // Pequeña pausa para asegurar que el navegador limpie el almacenamiento
             setTimeout(() => {
-                location.href = location.pathname; // Recarga limpia
+                location.href = location.pathname; 
             }, 500);
         }
     }
@@ -273,12 +270,19 @@
     async function generarExcel() {
         const wb = new ExcelJS.Workbook();
         const ws = wb.addWorksheet('Auditoria');
-        const ahora = new Date();
-        const opc = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         
+        // --- Formateo de Fecha DD/MM/YY ---
+        const dInput = document.getElementById('info-fecha').value.split('-');
+        const fechaFormateada = `${dInput[2]}/${dInput[1]}/${dInput[0].substring(2)}`;
+        
+        // --- Captura de Hora Fin ---
+        const ahora = new Date();
+        const horaFin = ahora.getHours().toString().padStart(2, '0') + ':' + ahora.getMinutes().toString().padStart(2, '0');
+
         let cols = [
-            {header:'MARCA TEMPORAL', key:'ts', width:30},
-            {header:'FECHA', key:'f', width:15},
+            {header:'FECHA', key:'f', width:12},
+            {header:'HORA INICIO', key:'hi', width:12},
+            {header:'HORA FIN', key:'hf', width:12},
             {header:'AUDITOR', key:'a', width:20},
             {header:'LÍNEA', key:'l', width:10},
             {header:'REGULADOR', key:'reg', width:20},
@@ -302,8 +306,9 @@
         ws.columns = cols;
 
         const info = { 
-            ts: ahora.toLocaleDateString('es-ES', opc), 
-            f: document.getElementById('info-fecha').value, 
+            f: fechaFormateada,
+            hi: document.getElementById('info-hora').value,
+            hf: horaFin,
             a: document.getElementById('info-auditor').value, 
             l: document.getElementById('info-linea').value, 
             reg: document.getElementById('info-regulador').value,
@@ -328,7 +333,7 @@
 
         for(let i=1; i<=preguntasData.length; i++) {
             const thumbs = document.getElementById('gal-'+i).children;
-            const startCol = 10 + (i-1)*5 + 2; 
+            const startCol = 11 + (i-1)*5 + 2; // Ajustado a 11 por la nueva columna Hora Fin
 
             for(let f = 0; f < thumbs.length; f++) {
                 const imgId = wb.addImage({ base64: thumbs[f].dataset.base, extension: 'png' });
