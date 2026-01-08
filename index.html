@@ -26,7 +26,11 @@
         input[value="B"]:checked + .opt-label { background: var(--success); color: white; border-color: var(--success); }
         input[value="M"]:checked + .opt-label { background: var(--danger); color: white; border-color: var(--danger); }
         input[value="NA"]:checked + .opt-label { background: var(--na); color: white; border-color: var(--na); }
-        .nc-box { display: none; background: #fff5f5; padding: 15px; border-radius: 4px; margin-top: 10px; border-left: 4px solid var(--danger); }
+        
+        .nc-box { display: none; background: #f1f3f4; padding: 15px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #bdc3c7; }
+        .nc-box.malo { background: #fff5f5; border-left-color: var(--danger); }
+        .nc-box.bueno { background: #f0f7ff; border-left-color: var(--primary); }
+
         .gallery { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
         .thumb-container { position: relative; width: 80px; height: 80px; }
         .thumb { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; border: 1px solid #ccc; }
@@ -56,7 +60,22 @@
                 <div class="field"><label>FECHA *</label><input type="date" id="info-fecha" onchange="quitarError(this)"></div>
                 <div class="field"><label>HORA INICIO *</label><input type="time" id="info-hora" onchange="quitarError(this)"></div>
                 <div class="field"><label>LÍNEA *</label><select id="info-linea" onchange="quitarError(this)"><option value="">Seleccione...</option><option>MA-01</option><option>MA-02</option><option>MA-03</option><option>MA-04</option><option>MA-05</option><option>MA-06</option><option>MA-08</option><option>MA-09</option><option>MA-10</option><option>FV-01</option><option>FV-03</option><option>FV-04</option><option>FV-05</option><option>FV-06</option></select></div>
-                <div class="field"><label>REGULADOR *</label><select id="info-regulador" onchange="quitarError(this)"><option value="">Seleccione...</option><option value="NA">NA</option><option>JULIAN FLORES</option><option>ARMANDO BERNAOLA</option><option>MILTON GARCIA</option><option>GERMAN GUZMAN</option><option>ALEXIS LOPEZ</option><option>ANTONIO MARTINEZ</option><option>LUIS FERNANDEZ</option><option>AANGEL SANCHEZ</option><option>ROBERTO AMASIFUEN</option><option>ROBERTO ESPINOZA</option><option>MAX FATAMA</option></select></div>
+                <div class="field"><label>REGULADOR *</label><select id="info-regulador" onchange="quitarError(this)">
+                    <option value="">Seleccione...</option>
+                    <option value="NA">NA</option>
+                    <option>JULIAN FLORES</option>
+                    <option>ARMANDO BERNAOLA</option>
+                    <option>MILTON GARCIA</option>
+                    <option>GERMAN GUZMAN</option>
+                    <option>ALEXIS LOPEZ</option>
+                    <option>ANTONIO MARTINEZ</option>
+                    <option>LUIS FERNANDEZ</option>
+                    <option>ANGEL SANCHEZ</option>
+                    <option>ROBERTO AMASIFUEN</option>
+                    <option>ROBERTO ESPINOZA</option>
+                    <option>MAX FATAMA</option>
+                    <option>PEDRO RIVAS</option>
+                </select></div>
                 <div class="field"><label>OPERADOR *</label><input type="text" id="info-operador" placeholder="o NA" oninput="quitarError(this)"></div>
                 <div class="field"><label>VERIFICADOR *</label><input type="text" id="info-verificador" placeholder="o NA" oninput="quitarError(this)"></div>
                 <div class="field"><label>ESTADO *</label><select id="info-estado" onchange="quitarError(this)"><option value="">Seleccione...</option><option>EN OPERACION</option><option>EN PREPARACION</option><option>INHABILITADA</option></select></div>
@@ -98,7 +117,7 @@
         {z: "COCHE", p: "¿El coche y su área se perciben limpios?"},
         {z: "COCHE", p: "¿Las delimitaciones y rótulos el coche están en buen estado?"},
         {z: "HORNO Y TABLERO", p: "¿No existen objetos innecesarios o ajenos en la zona del horno?"},
-        {z: "HORNO Y TABLERO", p: "Los elementos de la zona, piso y horno están limpios (ej. piso limpio, libre de polvo, derrames, exceso de fibra de vidrio y/o aceite)"},
+        {z: "HORNO Y TABLERO", p: "Los elementos de la zona, piso y horno están limpios (ej. piso limpio, libre de polvo, derrames, exceso de fibra de vidrio and/or aceite)"},
         {z: "HORNO Y TABLERO", p: "¿Existen señales visuales (riesgo de alta temperatura, botones del tablero, horno) están visibles, colocadas en sus lugares respectivo y en buen estado?"},
         {z: "CADENA DE TRANSPORTE 2 Y ZONA DE RANGUEO O EMBALAJE", p: "¿No hay materiales ajenos a la actividad propia del lugar (trapos, cartones, herramientas, etc.)?"},
         {z: "CADENA DE TRANSPORTE 2 Y ZONA DE RANGUEO O EMBALAJE", p: "Los elementos de la zona y el piso están limpios (ej. libre de residuos de vidrio, polvo, grasa y/o manchas de pintura)"},
@@ -119,7 +138,6 @@
         {z: "TODA LA LÍNEA Y ENTORNO", p: "¿Los pisos están en buenas condiciones físicas, parejos, regulares, no resbaladizos, sin rajaduras, etc.?"},
         {z: "TODA LA LÍNEA Y ENTORNO", p: "¿Las señales visuales y delimitaciones se mantienen uniformes en toda la línea?"},
         {z: "PERSONAL", p: "¿Usa correctamente sus EPP's (ej. zapatos, tapones auditivos, lentes y guantes según su actividad)?"},
-        {z: "PERSONAL", p: "¿Existen observaciones realizadas en auditorias anteriores que no han sido corregidas o que se repiten?"},
         {z: "PERSONAL", p: "¿Su uniforme se encuentra en buenas condiciones y es acorde al modelo vigente?"},
         {z: "PERSONAL", p: "¿El personal conoce y aplica la importancia de las 5S?"}
     ];
@@ -142,42 +160,14 @@
                     <input type="radio" name="p${id}" id="p${id}na" value="NA" onclick="handleRadio(${id},'NA')"><label class="opt-label" for="p${id}na">NA</label>
                 </div>
                 <div id="nc-${id}" class="nc-box">
-                    <textarea id="obs-${id}" placeholder="Describa el hallazgo..." oninput="verificarItemCompleto(${id})"></textarea>
+                    <textarea id="obs-${id}" placeholder="Comentarios u observaciones adicionales..." oninput="verificarItemCompleto(${id})"></textarea>
                     <div class="gallery" id="gal-${id}"></div>
                     <label style="background:#555;color:white;padding:12px;border-radius:4px;display:block;text-align:center;margin-top:10px;font-size:0.9rem;">
-                        📷 FOTO OBLIGATORIA (MÁX 3) <input type="file" accept="image/*" capture="environment" style="display:none" onchange="subirFoto(${id}, this)">
+                        📷 AÑADIR FOTO (MÁX 3) <input type="file" accept="image/*" capture="environment" style="display:none" onchange="subirFoto(${id}, this)">
                     </label>
                 </div>`;
             cont.appendChild(div);
         });
-    }
-
-    function inicializar() {
-        const ahora = new Date();
-        document.getElementById('info-fecha').value = ahora.toISOString().split('T')[0];
-        document.getElementById('info-hora').value = ahora.toTimeString().split(' ')[0].substring(0, 5);
-    }
-
-    function salvarFotoDB(idItem, base64Array) {
-        const tx = db.transaction("photos", "readwrite");
-        tx.objectStore("photos").put({ id: idItem, images: base64Array });
-    }
-
-    function cargarFotosGuardadas() {
-        const tx = db.transaction("photos", "readonly");
-        const store = tx.objectStore("photos");
-        store.openCursor().onsuccess = e => {
-            const cursor = e.target.result;
-            if (cursor) {
-                const { id, images } = cursor.value;
-                images.forEach(base64 => dibujarThumb(id, base64, false));
-                cursor.continue();
-            }
-        };
-    }
-
-    function borrarFotosDB() {
-        db.transaction("photos", "readwrite").objectStore("photos").clear();
     }
 
     function subirFoto(id, input) {
@@ -190,27 +180,16 @@
         }
     }
 
-    function dibujarThumb(idItem, base64, guardar) {
-        const div = document.createElement('div');
-        div.className = 'thumb-container'; div.dataset.base = base64;
-        div.innerHTML = `<img src="${base64}" class="thumb"><button class="btn-del" type="button" onclick="eliminarFoto(${idItem}, this)">×</button>`;
-        document.getElementById('gal-'+idItem).appendChild(div);
-        if(guardar) persistirFotosItem(idItem);
-    }
-
-    function eliminarFoto(idItem, btn) {
-        btn.parentElement.remove();
-        persistirFotosItem(idItem);
-        verificarItemCompleto(idItem);
-    }
-
-    function persistirFotosItem(idItem) {
-        const base64s = Array.from(document.getElementById('gal-'+idItem).children).map(c => c.dataset.base);
-        salvarFotoDB(idItem, base64s);
-    }
-
     function handleRadio(id, val) {
-        document.getElementById('nc-'+id).style.display = (val==='M'?'block':'none');
+        const box = document.getElementById('nc-'+id);
+        box.classList.remove('bueno', 'malo');
+        if (val === 'NA') {
+            box.style.display = 'none';
+        } else {
+            box.style.display = 'block';
+            if(val === 'B') box.classList.add('bueno');
+            if(val === 'M') box.classList.add('malo');
+        }
         verificarItemCompleto(id);
         guardarProgresoTexto();
     }
@@ -219,146 +198,99 @@
         const r = document.querySelector(`input[name="p${id}"]:checked`);
         const card = document.getElementById('card-'+id);
         if(!r) return;
-        const ok = (r.value !== 'M') || (document.getElementById('obs-'+id).value.trim().length >= 3 && document.getElementById('gal-'+id).children.length > 0);
+        
+        const index = id - 1;
+        const esPersonal = (preguntasData[index].z === "PERSONAL");
+        const obsLen = document.getElementById('obs-'+id).value.trim().length;
+        const tieneFoto = document.getElementById('gal-'+id).children.length > 0;
+
+        let ok = true;
+        if(r.value === 'M') {
+            // Regla corregida: Malo siempre pide comentario. Foto NO obligatoria solo en Personal.
+            ok = (obsLen >= 3) && (esPersonal || tieneFoto);
+        }
         if(ok) card.classList.remove('error-resaltado');
         guardarProgresoTexto();
-    }
-
-    function irAPaso2() {
-        const opVal = document.getElementById('info-op').value.trim();
-        const opRegex = /^(\d{9}|na)$/i;
-        const ids = ['info-auditor','info-fecha','info-hora','info-linea','info-regulador','info-operador','info-verificador','info-estado','info-op','info-lote'];
-        let err = false;
-        ids.forEach(id => {
-            const el = document.getElementById(id);
-            if(!el.value || (id==='info-op' && !opRegex.test(opVal))) { el.classList.add('error-resaltado'); err = true; }
-            else el.classList.remove('error-resaltado');
-        });
-        if(err) return alert("Complete los datos. OP: 9 dígitos o NA.");
-        document.getElementById('paso1').classList.remove('active');
-        document.getElementById('paso2').classList.add('active');
-        window.scrollTo(0,0);
     }
 
     function validarAuditoria() {
         let error = false; let primerErr = null;
         for(let i=1; i<=preguntasData.length; i++) {
             const r = document.querySelector(`input[name="p${i}"]:checked`);
-            const fail = !r || (r.value==='M' && (document.getElementById('obs-'+i).value.trim().length < 3 || document.getElementById('gal-'+i).children.length === 0));
-            if(fail) {
-                const card = document.getElementById('card-'+i); card.classList.add('error-resaltado');
-                if(!primerErr) primerErr = card; error = true;
-            }
+            if(!r) { marcarError(i); continue; }
+            
+            const index = i - 1;
+            const esPersonal = (preguntasData[index].z === "PERSONAL");
+            const obsLen = document.getElementById('obs-'+i).value.trim().length;
+            const tieneFoto = document.getElementById('gal-'+i).children.length > 0;
+
+            // BLOQUEO: Malo sin comentario, o Malo sin foto (si no es Personal)
+            const fail = (r.value==='M' && (obsLen < 3 || (!esPersonal && !tieneFoto)));
+
+            if(fail) marcarError(i);
         }
-        if(error) { primerErr.scrollIntoView({behavior:'smooth', block:'center'}); return alert("Faltan datos o fotos en MALO."); }
+
+        function marcarError(id) {
+            const card = document.getElementById('card-'+id);
+            card.classList.add('error-resaltado');
+            if(!primerErr) primerErr = card;
+            error = true;
+        }
+
+        if(error) { primerErr.scrollIntoView({behavior:'smooth', block:'center'}); return alert("⚠️ Hallazgos en MALO requieren comentario. Las fotos son obligatorias excepto en sección PERSONAL."); }
         document.getElementById('modalConfirm').style.display = 'flex';
     }
 
-    async function procesarFinal(limpiar) {
-        document.getElementById('modalConfirm').style.display = 'none';
-        await generarExcel();
-        if(limpiar) {
-            localStorage.removeItem('audit5S_text');
-            borrarFotosDB();
-            document.getElementById('mainForm').reset();
-            setTimeout(() => {
-                location.href = location.pathname; 
-            }, 500);
-        }
-    }
-
-    async function generarExcel() {
-        const wb = new ExcelJS.Workbook();
-        const ws = wb.addWorksheet('Auditoria');
-        
-        // --- Formateo de Fecha DD/MM/YY ---
-        const dInput = document.getElementById('info-fecha').value.split('-');
-        const fechaFormateada = `${dInput[2]}/${dInput[1]}/${dInput[0].substring(2)}`;
-        
-        // --- Captura de Hora Fin ---
+    // --- FUNCIONES ADICIONALES ---
+    function inicializar() {
         const ahora = new Date();
-        const horaFin = ahora.getHours().toString().padStart(2, '0') + ':' + ahora.getMinutes().toString().padStart(2, '0');
-
-        let cols = [
-            {header:'FECHA', key:'f', width:12},
-            {header:'HORA INICIO', key:'hi', width:12},
-            {header:'HORA FIN', key:'hf', width:12},
-            {header:'AUDITOR', key:'a', width:20},
-            {header:'LÍNEA', key:'l', width:10},
-            {header:'REGULADOR', key:'reg', width:20},
-            {header:'OPERADOR', key:'ope', width:20},      
-            {header:'VERIFICADOR', key:'ver', width:20},   
-            {header:'ESTADO', key:'est', width:15},        
-            {header:'OP', key:'op', width:12},
-            {header:'LOTE', key:'lote', width:12}          
-        ];
-
-        for(let i=1; i<=preguntasData.length; i++) {
-            const n = i < 10 ? '0'+i : i;
-            cols.push(
-                {header:`Item ${n}`, key:`p${i}`, width:10},
-                {header:`Descripción ${n}`, key:`nc${i}`, width:25},
-                {header:`Evidencia ${n}.1`, key:`e${i}_1`, width:20},
-                {header:`Evidencia ${n}.2`, key:`e${i}_2`, width:20},
-                {header:`Evidencia ${n}.3`, key:`e${i}_3`, width:20}
-            );
-        }
-        ws.columns = cols;
-
-        const info = { 
-            f: fechaFormateada,
-            hi: document.getElementById('info-hora').value,
-            hf: horaFin,
-            a: document.getElementById('info-auditor').value, 
-            l: document.getElementById('info-linea').value, 
-            reg: document.getElementById('info-regulador').value,
-            ope: document.getElementById('info-operador').value.toUpperCase(),
-            ver: document.getElementById('info-verificador').value.toUpperCase(),
-            est: document.getElementById('info-estado').value,                   
-            op: document.getElementById('info-op').value.toUpperCase(),
-            lote: document.getElementById('info-lote').value.toUpperCase()        
-        };
-
-        for(let i=1; i<=preguntasData.length; i++) {
-            const r = document.querySelector(`input[name="p${i}"]:checked`);
-            const val = r ? r.value : '';
-            info[`p${i}`] = val; 
-            info[`nc${i}`] = val === 'M' ? document.getElementById('obs-'+i).value : '';
-        }
-
-        const row = ws.addRow(info); 
-        row.height = 110; 
-
-        const padding = 200000; 
-
-        for(let i=1; i<=preguntasData.length; i++) {
-            const thumbs = document.getElementById('gal-'+i).children;
-            const startCol = 11 + (i-1)*5 + 2; // Ajustado a 11 por la nueva columna Hora Fin
-
-            for(let f = 0; f < thumbs.length; f++) {
-                const imgId = wb.addImage({ base64: thumbs[f].dataset.base, extension: 'png' });
-                
-                ws.addImage(imgId, { 
-                    tl: { col: startCol + f, row: row.number - 1, nativeColOff: padding, nativeRowOff: padding }, 
-                    br: { col: startCol + f + 1, row: row.number, nativeColOff: -padding, nativeRowOff: -padding },
-                    editAs: 'oneCell'
-                });
-            }
-        }
-
-        const buf = await wb.xlsx.writeBuffer();
-        saveAs(new Blob([buf]), `Audit_${info.l}_${info.op}.xlsx`);
+        document.getElementById('info-fecha').value = ahora.toISOString().split('T')[0];
+        document.getElementById('info-hora').value = ahora.toTimeString().split(' ')[0].substring(0, 5);
     }
-
+    function salvarFotoDB(idItem, base64Array) { const tx = db.transaction("photos", "readwrite"); tx.objectStore("photos").put({ id: idItem, images: base64Array }); }
+    function cargarFotosGuardadas() {
+        const tx = db.transaction("photos", "readonly");
+        tx.objectStore("photos").openCursor().onsuccess = e => {
+            const cursor = e.target.result;
+            if (cursor) {
+                cursor.value.images.forEach(base64 => dibujarThumb(cursor.value.id, base64, false));
+                cursor.continue();
+            }
+        };
+    }
+    function borrarFotosDB() { db.transaction("photos", "readwrite").objectStore("photos").clear(); }
+    function dibujarThumb(idItem, base64, guardar) {
+        const div = document.createElement('div');
+        div.className = 'thumb-container'; div.dataset.base = base64;
+        div.innerHTML = `<img src="${base64}" class="thumb"><button class="btn-del" type="button" onclick="eliminarFoto(${idItem}, this)">×</button>`;
+        document.getElementById('gal-'+idItem).appendChild(div);
+        if(guardar) persistirFotosItem(idItem);
+    }
+    function eliminarFoto(idItem, btn) { btn.parentElement.remove(); persistirFotosItem(idItem); verificarItemCompleto(idItem); }
+    function persistirFotosItem(idItem) {
+        const base64s = Array.from(document.getElementById('gal-'+idItem).children).map(c => c.dataset.base);
+        salvarFotoDB(idItem, base64s);
+    }
+    function irAPaso2() {
+        const ids = ['info-auditor','info-fecha','info-hora','info-linea','info-regulador','info-operador','info-verificador','info-estado','info-op','info-lote'];
+        let err = false;
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if(!el.value) { el.classList.add('error-resaltado'); err = true; }
+            else el.classList.remove('error-resaltado');
+        });
+        if(err) return alert("Complete los datos obligatorios.");
+        document.getElementById('paso1').classList.remove('active');
+        document.getElementById('paso2').classList.add('active');
+        window.scrollTo(0,0);
+    }
     function quitarError(el) { el.classList.remove('error-resaltado'); guardarProgresoTexto(); }
-    
     function guardarProgresoTexto() {
         const data = {};
         document.querySelectorAll('input[type="text"], select, input[type="date"], input[type="time"], textarea').forEach(el => data[el.id] = el.value);
         document.querySelectorAll('input[type="radio"]:checked').forEach(el => data[el.name] = el.value);
         localStorage.setItem('audit5S_text', JSON.stringify(data));
     }
-
     function cargarProgresoTexto() {
         const raw = localStorage.getItem('audit5S_text');
         if(!raw) return;
@@ -367,15 +299,54 @@
             const el = document.getElementById(key);
             if(el) el.value = data[key];
             const rb = document.querySelector(`input[name="${key}"][value="${data[key]}"]`);
-            if(rb) { 
-                rb.checked = true; 
-                if(data[key]==='M') {
-                    const idNum = key.replace('p','');
-                    const ncBox = document.getElementById('nc-'+idNum);
-                    if(ncBox) ncBox.style.display = 'block';
-                } 
+            if(rb) { rb.checked = true; handleRadio(key.replace('p',''), data[key]); }
+        }
+    }
+    async function procesarFinal(limpiar) {
+        document.getElementById('modalConfirm').style.display = 'none';
+        await generarExcel();
+        if(limpiar) {
+            localStorage.removeItem('audit5S_text');
+            borrarFotosDB();
+            document.getElementById('mainForm').reset();
+            setTimeout(() => { location.href = location.pathname; }, 600);
+        }
+    }
+    async function generarExcel() {
+        const wb = new ExcelJS.Workbook();
+        const ws = wb.addWorksheet('Auditoria');
+        const dInput = document.getElementById('info-fecha').value.split('-');
+        const fechaFormateada = `${dInput[2]}/${dInput[1]}/${dInput[0].substring(2)}`;
+        const ahora = new Date();
+        const horaFin = ahora.getHours().toString().padStart(2, '0') + ':' + ahora.getMinutes().toString().padStart(2, '0');
+        
+        let cols = [{header:'FECHA', key:'f', width:12},{header:'HORA INICIO', key:'hi', width:12},{header:'HORA FIN', key:'hf', width:12},{header:'AUDITOR', key:'a', width:20},{header:'LÍNEA', key:'l', width:10},{header:'REGULADOR', key:'reg', width:20},{header:'OPERADOR', key:'ope', width:20},{header:'VERIFICADOR', key:'ver', width:20},{header:'ESTADO', key:'est', width:15},{header:'OP', key:'op', width:12},{header:'LOTE', key:'lote', width:12}];
+        for(let i=1; i<=preguntasData.length; i++) {
+            const n = i < 10 ? '0'+i : i;
+            cols.push({header:`Item ${n}`, key:`p${i}`, width:10},{header:`Descripción ${n}`, key:`nc${i}`, width:25},{header:`Evidencia ${n}.1`, key:`e${i}_1`, width:20},{header:`Evidencia ${n}.2`, key:`e${i}_2`, width:20},{header:`Evidencia ${n}.3`, key:`e${i}_3`, width:20});
+        }
+        ws.columns = cols;
+        const info = { f: fechaFormateada, hi: document.getElementById('info-hora').value, hf: horaFin, a: document.getElementById('info-auditor').value, l: document.getElementById('info-linea').value, reg: document.getElementById('info-regulador').value, ope: document.getElementById('info-operador').value.toUpperCase(), ver: document.getElementById('info-verificador').value.toUpperCase(), est: document.getElementById('info-estado').value, op: document.getElementById('info-op').value.toUpperCase(), lote: document.getElementById('info-lote').value.toUpperCase() };
+        for(let i=1; i<=preguntasData.length; i++) {
+            const r = document.querySelector(`input[name="p${i}"]:checked`);
+            info[`p${i}`] = r ? r.value : '';
+            info[`nc${i}`] = (r && r.value !== 'NA') ? document.getElementById('obs-'+i).value : '';
+        }
+        const row = ws.addRow(info); row.height = 110;
+        const padding = 250000;
+        for(let i=1; i<=preguntasData.length; i++) {
+            const r = document.querySelector(`input[name="p${i}"]:checked`);
+            if (r && r.value !== 'NA') {
+                const thumbs = document.getElementById('gal-'+i).children;
+                const startCol = 11 + (i-1)*5 + 2;
+                for(let f = 0; f < thumbs.length; f++) {
+                    const imgId = wb.addImage({ base64: thumbs[f].dataset.base, extension: 'png' });
+                    ws.addImage(imgId, { tl: { col: startCol + f, row: row.number - 1, nativeColOff: padding, nativeRowOff: padding }, br: { col: startCol + f + 1, row: row.number, nativeColOff: -padding, nativeRowOff: -padding }, editAs: 'twoCell' });
+                }
             }
         }
+        const buf = await wb.xlsx.writeBuffer();
+        saveAs(new Blob([buf]), `Audit_${info.l}_${info.op}.xlsx`);
     }
 </script>
 </body>
