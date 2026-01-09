@@ -2,13 +2,13 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AUDITORÍAS 5S - AMFA VITRUM</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         :root { --primary: #1a73e8; --danger: #d93025; --success: #1e8e3e; --na: #5f6368; --bg: #f8f9fa; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg); margin: 0; padding: 10px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg); margin: 0; padding: 10px; -webkit-tap-highlight-color: transparent; }
         .container { max-width: 900px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin: auto; overflow: hidden; }
         .header-title { text-align: center; padding: 15px; border-bottom: 2px solid #e8f0fe; color: var(--primary); margin: 0; }
         .seccion { display: none; padding: 20px; }
@@ -16,27 +16,18 @@
         .grid-header { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; background: #fdfdfd; padding: 15px; border-radius: 8px; border: 1px solid #eee; }
         .field { display: flex; flex-direction: column; margin-bottom: 10px; }
         label { font-size: 0.8rem; font-weight: bold; color: #5f6368; margin-bottom: 5px; text-transform: uppercase; }
-        input, select, textarea { padding: 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 16px; width: 100%; box-sizing: border-box; }
+        input, select, textarea { padding: 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 16px; width: 100%; box-sizing: border-box; -webkit-appearance: none; }
         
         .zona-bloque { margin-top: 20px; border-radius: 12px; padding: 10px; border: 1px solid rgba(0,0,0,0.05); }
         .zona-header { color: #2c3e50; padding: 12px 15px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; border-radius: 8px; font-size: 1.1rem; }
         
-        .zona-materia-prima { background-color: #e8f5e9; } 
-        .zona-formadora { background-color: #fff3e0; }    
-        .zona-transporte-1 { background-color: #f3e5f5; } 
-        .zona-coche { background-color: #fffde7; }        
-        .zona-horno { background-color: #fbe9e7; }         
-        .zona-transporte-2 { background-color: #e0f7fa; } 
-        .zona-mesa { background-color: #f5f5f5; }         
-        .zona-producto-terminado { background-color: #f9fbe7; } 
-        .zona-linea-entorno { background-color: #efebe9; } 
-        .zona-personal { background-color: #fce4ec; }      
+        /* Colores Pastel */
+        .zona-materia-prima { background-color: #e8f5e9; } .zona-formadora { background-color: #fff3e0; } .zona-transporte-1 { background-color: #f3e5f5; } .zona-coche { background-color: #fffde7; } .zona-horno { background-color: #fbe9e7; } .zona-transporte-2 { background-color: #e0f7fa; } .zona-mesa { background-color: #f5f5f5; } .zona-producto-terminado { background-color: #f9fbe7; } .zona-linea-entorno { background-color: #efebe9; } .zona-personal { background-color: #fce4ec; }      
 
         .item-pregunta { padding: 15px; background: rgba(255,255,255,0.6); border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(0,0,0,0.03); }
         .error-resaltado { border: 3px dashed var(--danger) !important; background: #fff8f8 !important; }
         .opciones-respuesta { display: flex; gap: 8px; margin-top: 10px; }
         .opt-label { flex: 1; text-align: center; padding: 10px; border: 1px solid #dadce0; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; min-height: 45px; background: white; }
-        
         input[type="radio"] { display: none; }
         input[value="B"]:checked + .opt-label { background: var(--success); color: white; border-color: var(--success); }
         input[value="M"]:checked + .opt-label { background: var(--danger); color: white; border-color: var(--danger); }
@@ -46,26 +37,28 @@
         .nc-box.malo { border-left-color: var(--danger); }
         .nc-box.bueno { border-left-color: var(--primary); }
 
-        .gallery { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-        .thumb-container { position: relative; width: 80px; height: 80px; }
-        .thumb { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; border: 1px solid #ccc; }
-        .btn-del { position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; width: 22px; height: 22px; border: none; cursor: pointer; }
-        .btn-blue { background: var(--primary); color: white; border: none; padding: 18px; width: 100%; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        #modalConfirm { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center; }
-        .modal-content { background:white; padding:20px; border-radius:8px; width:90%; max-width:400px; text-align:center; }
+        .btn-blue { background: var(--primary); color: white; border: none; padding: 18px; width: 100%; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 20px; -webkit-appearance: none; }
+        #modalConfirm { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center; }
+        .modal-content { background:white; padding:25px; border-radius:12px; width:90%; max-width:400px; text-align:center; box-sizing: border-box; }
     </style>
 </head>
 <body onload="inicializar()">
 
 <div id="modalConfirm">
     <div class="modal-content">
-        <h3>Auditoría Finalizada</h3>
-        <p id="msgProcesando">¿Desea descargar el reporte?</p>
-        <div id="botonesModal">
-            <button class="btn-blue" onclick="procesarFinal(true)">DESCARGAR Y LIMPIAR</button>
-            <button class="btn-blue" style="background:#607d8b" onclick="procesarFinal(false)">SOLO DESCARGAR</button>
+        <h3 id="tituloModal">Finalizar Auditoría</h3>
+        <p id="msgProcesando">¿Desea descargar el archivo Excel?</p>
+        
+        <div id="controlesDescarga">
+            <button class="btn-blue" onclick="ejecutarDescargaSegura()">DESCARGAR EXCEL</button>
+            <button class="btn-blue" style="background:#607d8b" onclick="cerrarModal()">CANCELAR</button>
         </div>
-        <button id="btnReiniciarManual" class="btn-blue" style="display:none; background:var(--success)" onclick="location.reload()">NUEVA AUDITORÍA (LIMPIAR)</button>
+
+        <div id="controlesLimpieza" style="display:none;">
+            <p style="color:var(--success); font-weight:bold;">¡Descarga iniciada!</p>
+            <p>Presione el botón de abajo solo cuando el archivo se haya guardado.</p>
+            <button class="btn-blue" style="background:var(--success)" onclick="finalizarTodo()">CONFIRMAR Y LIMPIAR DATOS</button>
+        </div>
     </div>
 </div>
 
@@ -93,7 +86,7 @@
         </div>
         <div id="paso2" class="seccion">
             <div id="contenedor-preguntas"></div>
-            <button type="button" id="btnFinalizar" class="btn-blue" style="background:var(--success)" onclick="validarAuditoria()">FINALIZAR Y DESCARGAR</button>
+            <button type="button" class="btn-blue" style="background:var(--success)" onclick="abrirConfirmacion()">FINALIZAR Y DESCARGAR</button>
         </div>
     </form>
 </div>
@@ -122,7 +115,7 @@
         {z: "COCHE", c: "zona-coche", p: "¿Todos los elementos del coche tienen un lugar asignado?"},
         {z: "COCHE", c: "zona-coche", p: "¿El coche y su área se perciben limpios?"},
         {z: "COCHE", c: "zona-coche", p: "¿Las delimitaciones y rótulos el coche están en buen estado?"},
-        {z: "HORNO Y TABLERO", c: "zona-horno", p: "¿No existen objetos innecesarios o ajenos en la zona?"},
+        {z: "HORNO Y TABLERO", c: "zona-horno", p: "¿No existen objetos innecesarios o ajenos en la zona del horno?"},
         {z: "HORNO Y TABLERO", c: "zona-horno", p: "Los elementos de la zona, piso y horno están limpios"},
         {z: "HORNO Y TABLERO", c: "zona-horno", p: "¿Existen señales visuales visibles y en buen estado?"},
         {z: "CADENA DE TRANSPORTE 2 Y ZONA DE RANGUEO O EMBALAJE", c: "zona-transporte-2", p: "¿No hay materiales ajenos a la actividad?"},
@@ -137,7 +130,7 @@
         {z: "ZONA DE PRODUCTO TERMINADO", c: "zona-producto-terminado", p: "¿Cada bandeja está identificada correctamente?"},
         {z: "ZONA DE PRODUCTO TERMINADO", c: "zona-producto-terminado", p: "Los elementos de la zona están limpios"},
         {z: "ZONA DE PRODUCTO TERMINADO", c: "zona-producto-terminado", p: "¿Las delimitaciones están en buen estado?"},
-        {z: "TODA LA LÍNEA Y ENTORNO", c: "zona-linea-entorno", p: "¿Se han retirado elementos innecesarios de las zonas?"},
+        {z: "TODA LA LÍNEA Y ENTORNO", c: "zona-linea-entorno", p: "¿Se han retirado elementos innecesarios de las zonas de tránsito?"},
         {z: "TODA LA LÍNEA Y ENTORNO", c: "zona-linea-entorno", p: "¿Se han dispuesto artículos por uso diario?"},
         {z: "TODA LA LÍNEA Y ENTORNO", c: "zona-linea-entorno", p: "¿Existen espacios delimitados para la basura?"},
         {z: "TODA LA LÍNEA Y ENTORNO", c: "zona-linea-entorno", p: "¿El piso está limpio y libre de residuos?"},
@@ -151,21 +144,15 @@
 
     function renderizar() {
         const cont = document.getElementById('contenedor-preguntas');
-        cont.innerHTML = "";
-        let currentZ = "";
-        let currentDivBloque = null;
+        let currentZ = ""; let currentDivBloque = null;
         preguntasData.forEach((item, i) => {
             const id = i + 1;
             if(item.z !== currentZ) {
-                currentDivBloque = document.createElement('div');
-                currentDivBloque.className = 'zona-bloque ' + item.c;
+                currentDivBloque = document.createElement('div'); currentDivBloque.className = 'zona-bloque ' + item.c;
                 const h = document.createElement('div'); h.className = 'zona-header'; h.innerText = item.z;
-                currentDivBloque.appendChild(h);
-                cont.appendChild(currentDivBloque);
-                currentZ = item.z;
+                currentDivBloque.appendChild(h); cont.appendChild(currentDivBloque); currentZ = item.z;
             }
-            const div = document.createElement('div');
-            div.className = 'item-pregunta'; div.id = `card-${id}`;
+            const div = document.createElement('div'); div.className = 'item-pregunta'; div.id = `card-${id}`;
             div.innerHTML = `<p><strong>${id}.</strong> ${item.p}</p>
                 <div class="opciones-respuesta">
                     <input type="radio" name="p${id}" id="p${id}b" value="B" onclick="handleRadio(${id},'B')"><label class="opt-label" for="p${id}b">BUENO</label>
@@ -183,92 +170,33 @@
         });
     }
 
-    async function procesarFinal(limpiar) {
-        document.getElementById('botonesModal').style.display = 'none';
-        document.getElementById('msgProcesando').innerText = "Generando archivo... Por favor acepte la descarga.";
+    function abrirConfirmacion() {
+        if (!validarFormulario()) return;
+        document.getElementById('controlesDescarga').style.display = 'block';
+        document.getElementById('controlesLimpieza').style.display = 'none';
+        document.getElementById('tituloModal').innerText = "Finalizar Auditoría";
+        document.getElementById('modalConfirm').style.display = 'flex';
+    }
+
+    async function ejecutarDescargaSegura() {
+        document.getElementById('controlesDescarga').style.display = 'none';
+        document.getElementById('tituloModal').innerText = "Procesando...";
+        document.getElementById('msgProcesando').innerText = "Generando Excel. Por favor acepte la descarga de Safari.";
         
-        await generarExcel(); 
+        await generarExcel();
 
-        if(limpiar) {
-            localStorage.removeItem('audit5S_text');
-            db.transaction("photos", "readwrite").objectStore("photos").clear();
-            document.getElementById('msgProcesando').innerText = "Archivo generado. Presione el botón verde para limpiar y empezar otra.";
-            document.getElementById('btnReiniciarManual').style.display = 'block';
-        } else {
-            setTimeout(() => {
-                document.getElementById('modalConfirm').style.display = 'none';
-                document.getElementById('botonesModal').style.display = 'block';
-                document.getElementById('msgProcesando').innerText = "¿Desea descargar el reporte?";
-            }, 2000);
-        }
+        // Tras descargar, mostramos el botón de limpiar pero NO recargamos
+        document.getElementById('controlesLimpieza').style.display = 'block';
+        document.getElementById('msgProcesando').innerText = "Excel enviado.";
     }
 
-    async function generarExcel() {
-        const wb = new ExcelJS.Workbook();
-        const ws = wb.addWorksheet('Auditoria');
-        const dInput = document.getElementById('info-fecha').value.split('-');
-        const fechaParaExcel = `${dInput[2]}/${dInput[1]}/${dInput[0].substring(2)}`;
-        const ahora = new Date();
-        const horaFin = ahora.getHours().toString().padStart(2, '0') + ':' + ahora.getMinutes().toString().padStart(2, '0');
-
-        let cols = [{header:'FECHA', key:'f', width:12},{header:'HORA INICIO', key:'hi', width:12},{header:'HORA FIN', key:'hf', width:12},{header:'AUDITOR', key:'a', width:20},{header:'LÍNEA', key:'l', width:10},{header:'REGULADOR', key:'reg', width:20},{header:'OPERADOR', key:'ope', width:20},{header:'VERIFICADOR', key:'ver', width:20},{header:'ESTADO', key:'est', width:15},{header:'OP', key:'op', width:12},{header:'LOTE', key:'lote', width:12}];
-        for(let i=1; i<=preguntasData.length; i++) {
-            const n = i < 10 ? '0'+i : i;
-            cols.push({header:`Item ${n}`, key:`p${i}`, width:10},{header:`Descripción ${n}`, key:`nc${i}`, width:25},{header:`Evidencia ${n}.1`, key:`e${i}_1`, width:20},{header:`Evidencia ${n}.2`, key:`e${i}_2`, width:20},{header:`Evidencia ${n}.3`, key:`e${i}_3`, width:20});
-        }
-        ws.columns = cols;
-
-        const info = { f: fechaParaExcel, hi: document.getElementById('info-hora').value, hf: horaFin, a: document.getElementById('info-auditor').value, l: document.getElementById('info-linea').value, reg: document.getElementById('info-regulador').value, ope: document.getElementById('info-operador').value.toUpperCase(), ver: document.getElementById('info-verificador').value.toUpperCase(), est: document.getElementById('info-estado').value, op: document.getElementById('info-op').value.toUpperCase(), lote: document.getElementById('info-lote').value.toUpperCase() };
-        
-        for(let i=1; i<=preguntasData.length; i++) {
-            const r = document.querySelector(`input[name="p${i}"]:checked`);
-            info[`p${i}`] = r ? r.value : '';
-            info[`nc${i}`] = (r && r.value !== 'NA') ? document.getElementById('obs-'+i).value : '';
-        }
-        const row = ws.addRow(info); row.height = 110;
-
-        for(let i=1; i<=preguntasData.length; i++) {
-            const r = document.querySelector(`input[name="p${i}"]:checked`);
-            if (r && r.value !== 'NA') {
-                const thumbs = document.getElementById('gal-'+i).children;
-                const startCol = 11 + (i-1)*5 + 2;
-                for(let f = 0; f < thumbs.length; f++) {
-                    const imgId = wb.addImage({ base64: thumbs[f].dataset.base, extension: 'png' });
-                    ws.addImage(imgId, { tl: { col: startCol + f, row: row.number - 1, nativeColOff: 250000, nativeRowOff: 250000 }, br: { col: startCol + f + 1, row: row.number, nativeColOff: -250000, nativeRowOff: -250000 }, editAs: 'twoCell' });
-                }
-            }
-        }
-        const buffer = await wb.xlsx.writeBuffer();
-        const fechaArchivo = fechaParaExcel.replace(/\//g, '-');
-        saveAs(new Blob([buffer]), `${fechaArchivo}-${info.l}-${info.a.toUpperCase()}.xlsx`);
+    function finalizarTodo() {
+        localStorage.removeItem('audit5S_text');
+        borrarFotosDB();
+        location.reload(); // Solo ahora, cuando el usuario ya aceptó el archivo, reiniciamos.
     }
 
-    // --- FUNCIONES RESTANTES ---
-    function handleRadio(id, val) {
-        const box = document.getElementById('nc-'+id);
-        box.classList.remove('bueno', 'malo');
-        if (val === 'NA') box.style.display = 'none';
-        else {
-            box.style.display = 'block';
-            if(val === 'B') box.classList.add('bueno');
-            if(val === 'M') box.classList.add('malo');
-        }
-        verificarItemCompleto(id); guardarProgresoTexto();
-    }
-    function verificarItemCompleto(id) {
-        const r = document.querySelector(`input[name="p${id}"]:checked`);
-        if(!r) return;
-        const index = id - 1;
-        const esPersonal = (preguntasData[index].z === "PERSONAL");
-        const obsLen = document.getElementById('obs-'+id).value.trim().length;
-        const tieneFoto = document.getElementById('gal-'+id).children.length > 0;
-        let ok = true;
-        if(r.value === 'M') ok = (obsLen >= 3) && (esPersonal || tieneFoto);
-        else if(r.value === 'B') if(tieneFoto && obsLen < 3) ok = false;
-        if(ok) document.getElementById('card-'+id).classList.remove('error-resaltado');
-        guardarProgresoTexto();
-    }
-    function validarAuditoria() {
+    function validarFormulario() {
         let error = false; let primerErr = null;
         for(let i=1; i<=preguntasData.length; i++) {
             const r = document.querySelector(`input[name="p${i}"]:checked`);
@@ -283,8 +211,67 @@
             const card = document.getElementById('card-'+id); card.classList.add('error-resaltado');
             if(!primerErr) primerErr = card; error = true;
         }
-        if(error) { primerErr.scrollIntoView({behavior:'smooth', block:'center'}); return alert("⚠️ Error: Faltan comentarios o fotos obligatorias."); }
-        document.getElementById('modalConfirm').style.display = 'flex';
+        if(error) { primerErr.scrollIntoView({behavior:'smooth', block:'center'}); alert("⚠️ Revise los campos en rojo."); return false; }
+        return true;
+    }
+
+    async function generarExcel() {
+        const wb = new ExcelJS.Workbook();
+        const ws = wb.addWorksheet('Auditoria');
+        const dInput = document.getElementById('info-fecha').value.split('-');
+        const fechaExcel = `${dInput[2]}/${dInput[1]}/${dInput[0].substring(2)}`;
+        const ahora = new Date();
+        const horaFin = ahora.getHours().toString().padStart(2, '0') + ':' + ahora.getMinutes().toString().padStart(2, '0');
+
+        let cols = [{header:'FECHA', key:'f', width:12},{header:'HORA INICIO', key:'hi', width:12},{header:'HORA FIN', key:'hf', width:12},{header:'AUDITOR', key:'a', width:20},{header:'LÍNEA', key:'l', width:10},{header:'REGULADOR', key:'reg', width:20},{header:'OPERADOR', key:'ope', width:20},{header:'VERIFICADOR', key:'ver', width:20},{header:'ESTADO', key:'est', width:15},{header:'OP', key:'op', width:12},{header:'LOTE', key:'lote', width:12}];
+        for(let i=1; i<=preguntasData.length; i++) {
+            const n = i < 10 ? '0'+i : i;
+            cols.push({header:`Item ${n}`, key:`p${i}`, width:10},{header:`Descripción ${n}`, key:`nc${i}`, width:25},{header:`Evidencia ${n}.1`, key:`e${i}_1`, width:20},{header:`Evidencia ${n}.2`, key:`e${i}_2`, width:20},{header:`Evidencia ${n}.3`, key:`e${i}_3`, width:20});
+        }
+        ws.columns = cols;
+
+        const info = { f: fechaExcel, hi: document.getElementById('info-hora').value, hf: horaFin, a: document.getElementById('info-auditor').value, l: document.getElementById('info-linea').value, reg: document.getElementById('info-regulador').value, ope: document.getElementById('info-operador').value.toUpperCase(), ver: document.getElementById('info-verificador').value.toUpperCase(), est: document.getElementById('info-estado').value, op: document.getElementById('info-op').value.toUpperCase(), lote: document.getElementById('info-lote').value.toUpperCase() };
+        for(let i=1; i<=preguntasData.length; i++) {
+            const r = document.querySelector(`input[name="p${i}"]:checked`);
+            info[`p${i}`] = r ? r.value : '';
+            info[`nc${i}`] = (r && r.value !== 'NA') ? document.getElementById('obs-'+i).value : '';
+        }
+        const row = ws.addRow(info); row.height = 110;
+        const padding = 250000;
+
+        for(let i=1; i<=preguntasData.length; i++) {
+            const r = document.querySelector(`input[name="p${i}"]:checked`);
+            if (r && r.value !== 'NA') {
+                const thumbs = document.getElementById('gal-'+i).children;
+                const startCol = 11 + (i-1)*5 + 2;
+                for(let f = 0; f < thumbs.length; f++) {
+                    const imgId = wb.addImage({ base64: thumbs[f].dataset.base, extension: 'png' });
+                    ws.addImage(imgId, { tl: { col: startCol + f, row: row.number - 1, nativeColOff: padding, nativeRowOff: padding }, br: { col: startCol + f + 1, row: row.number, nativeColOff: -padding, nativeRowOff: -padding }, editAs: 'twoCell' });
+                }
+            }
+        }
+        const buffer = await wb.xlsx.writeBuffer();
+        const fName = fechaExcel.replace(/\//g, '-') + "-" + info.l + "-" + info.a.toUpperCase();
+        saveAs(new Blob([buffer]), `${fName}.xlsx`);
+    }
+
+    // --- FUNCIONES AUXILIARES ---
+    function handleRadio(id, val) {
+        const box = document.getElementById('nc-'+id); box.classList.remove('bueno', 'malo');
+        if (val === 'NA') box.style.display = 'none';
+        else { box.style.display = 'block'; if(val === 'B') box.classList.add('bueno'); if(val === 'M') box.classList.add('malo'); }
+        verificarItemCompleto(id); guardarProgresoTexto();
+    }
+    function verificarItemCompleto(id) {
+        const r = document.querySelector(`input[name="p${id}"]:checked`);
+        if(!r) return;
+        const esPersonal = (preguntasData[id-1].z === "PERSONAL");
+        const obsLen = document.getElementById('obs-'+id).value.trim().length;
+        const tieneFoto = document.getElementById('gal-'+id).children.length > 0;
+        let ok = (r.value !== 'M') || (obsLen >= 3 && (esPersonal || tieneFoto));
+        if(r.value === 'B' && tieneFoto && obsLen < 3) ok = false;
+        if(ok) document.getElementById('card-'+id).classList.remove('error-resaltado');
+        guardarProgresoTexto();
     }
     function inicializar() {
         const ahora = new Date();
@@ -303,8 +290,7 @@
     function dibujarThumb(idItem, base64, guardar) {
         const div = document.createElement('div'); div.className = 'thumb-container'; div.dataset.base = base64;
         div.innerHTML = `<img src="${base64}" class="thumb"><button class="btn-del" type="button" onclick="eliminarFoto(${idItem}, this)">×</button>`;
-        document.getElementById('gal-'+idItem).appendChild(div);
-        if(guardar) persistirFotosItem(idItem);
+        document.getElementById('gal-'+idItem).appendChild(div); if(guardar) persistirFotosItem(idItem);
     }
     function eliminarFoto(idItem, btn) { btn.parentElement.remove(); persistirFotosItem(idItem); verificarItemCompleto(idItem); }
     function persistirFotosItem(idItem) {
@@ -314,14 +300,9 @@
     function irAPaso2() {
         const ids = ['info-auditor','info-fecha','info-hora','info-linea','info-regulador','info-operador','info-verificador','info-estado','info-op','info-lote'];
         let err = false;
-        ids.forEach(id => {
-            const el = document.getElementById(id);
-            if(!el.value) { el.classList.add('error-resaltado'); err = true; } else el.classList.remove('error-resaltado');
-        });
-        if(err) return alert("Complete los datos obligatorios.");
-        document.getElementById('paso1').classList.remove('active');
-        document.getElementById('paso2').classList.add('active');
-        window.scrollTo(0,0);
+        ids.forEach(id => { const el = document.getElementById(id); if(!el.value) { el.classList.add('error-resaltado'); err = true; } else el.classList.remove('error-resaltado'); });
+        if(err) return alert("Complete los datos.");
+        document.getElementById('paso1').classList.remove('active'); document.getElementById('paso2').classList.add('active'); window.scrollTo(0,0);
     }
     function quitarError(el) { el.classList.remove('error-resaltado'); guardarProgresoTexto(); }
     function guardarProgresoTexto() {
@@ -331,22 +312,21 @@
         localStorage.setItem('audit5S_text', JSON.stringify(data));
     }
     function cargarProgresoTexto() {
-        const raw = localStorage.getItem('audit5S_text');
-        if(!raw) return;
+        const raw = localStorage.getItem('audit5S_text'); if(!raw) return;
         const data = JSON.parse(raw);
         for(let key in data) {
-            const el = document.getElementById(key);
-            if(el) el.value = data[key];
+            const el = document.getElementById(key); if(el) el.value = data[key];
             const rb = document.querySelector(`input[name="${key}"][value="${data[key]}"]`);
             if(rb) { rb.checked = true; handleRadio(key.replace('p',''), data[key]); }
         }
     }
     function cargarFotosGuardadas() {
         db.transaction("photos", "readonly").objectStore("photos").openCursor().onsuccess = e => {
-            const cursor = e.target.result;
-            if (cursor) { cursor.value.images.forEach(base64 => dibujarThumb(cursor.value.id, base64, false)); cursor.continue(); }
+            const cursor = e.target.result; if (cursor) { cursor.value.images.forEach(base64 => dibujarThumb(cursor.value.id, base64, false)); cursor.continue(); }
         };
     }
+    function borrarFotosDB() { db.transaction("photos", "readwrite").objectStore("photos").clear(); }
+    function cerrarModal() { document.getElementById('modalConfirm').style.display = 'none'; }
 </script>
 </body>
 </html>
