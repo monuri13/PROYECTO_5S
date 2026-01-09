@@ -60,11 +60,12 @@
 <div id="modalConfirm">
     <div class="modal-content">
         <h3>Auditoría Finalizada</h3>
-        <p id="msgProcesando">¿Qué desea hacer con los datos actuales?</p>
+        <p id="msgProcesando">¿Desea descargar el reporte?</p>
         <div id="botonesModal">
-            <button class="btn-blue" onclick="procesarFinal(true)">DESCARGAR Y LIMPIAR TODO</button>
+            <button class="btn-blue" onclick="procesarFinal(true)">DESCARGAR Y LIMPIAR</button>
             <button class="btn-blue" style="background:#607d8b" onclick="procesarFinal(false)">SOLO DESCARGAR</button>
         </div>
+        <button id="btnReiniciarManual" class="btn-blue" style="display:none; background:var(--success)" onclick="location.reload()">NUEVA AUDITORÍA (LIMPIAR)</button>
     </div>
 </div>
 
@@ -182,85 +183,23 @@
         });
     }
 
-    function handleRadio(id, val) {
-        const box = document.getElementById('nc-'+id);
-        box.classList.remove('bueno', 'malo');
-        if (val === 'NA') { box.style.display = 'none'; } 
-        else {
-            box.style.display = 'block';
-            if(val === 'B') box.classList.add('bueno');
-            if(val === 'M') box.classList.add('malo');
-        }
-        verificarItemCompleto(id);
-        guardarProgresoTexto();
-    }
-
-    function verificarItemCompleto(id) {
-        const r = document.querySelector(`input[name="p${id}"]:checked`);
-        const card = document.getElementById('card-'+id);
-        if(!r) return;
-        const index = id - 1;
-        const esPersonal = (preguntasData[index].z === "PERSONAL");
-        const obsLen = document.getElementById('obs-'+id).value.trim().length;
-        const tieneFoto = document.getElementById('gal-'+id).children.length > 0;
-        let ok = true;
-        if(r.value === 'M') ok = (obsLen >= 3) && (esPersonal || tieneFoto);
-        else if(r.value === 'B') if(tieneFoto && obsLen < 3) ok = false;
-        if(ok) card.classList.remove('error-resaltado');
-        guardarProgresoTexto();
-    }
-
-    function validarAuditoria() {
-        let error = false; let primerErr = null;
-        for(let i=1; i<=preguntasData.length; i++) {
-            const r = document.querySelector(`input[name="p${i}"]:checked`);
-            if(!r) { marcarError(i); continue; }
-            const index = i - 1;
-            const esPersonal = (preguntasData[index].z === "PERSONAL");
-            const obsLen = document.getElementById('obs-'+i).value.trim().length;
-            const tieneFoto = document.getElementById('gal-'+i).children.length > 0;
-            let fail = false;
-            if(r.value === 'M') fail = (obsLen < 3 || (!esPersonal && !tieneFoto));
-            else if(r.value === 'B') if(tieneFoto && obsLen < 3) fail = true;
-            if(fail) marcarError(i);
-        }
-        function marcarError(id) {
-            const card = document.getElementById('card-'+id);
-            card.classList.add('error-resaltado');
-            if(!primerErr) primerErr = card;
-            error = true;
-        }
-        if(error) { primerErr.scrollIntoView({behavior:'smooth', block:'center'}); return alert("⚠️ Error: Revise los campos obligatorios."); }
-        document.getElementById('modalConfirm').style.display = 'flex';
-    }
-
     async function procesarFinal(limpiar) {
-        // Bloqueo de UI para evitar doble clic
         document.getElementById('botonesModal').style.display = 'none';
-        document.getElementById('msgProcesando').innerText = "Generando archivo Excel... por favor espere.";
+        document.getElementById('msgProcesando').innerText = "Generando archivo... Por favor acepte la descarga.";
         
-        try {
-            await generarExcel(); // Genera y descarga el archivo
-            
-            if(limpiar) {
-                // Espera un poco para que el navegador inicie la descarga antes de recargar
-                setTimeout(() => {
-                    localStorage.removeItem('audit5S_text');
-                    borrarFotosDB();
-                    document.getElementById('mainForm').reset();
-                    location.href = location.pathname;
-                }, 1500); 
-            } else {
-                // Si no se limpia, restaurar el modal
-                setTimeout(() => {
-                    document.getElementById('modalConfirm').style.display = 'none';
-                    document.getElementById('botonesModal').style.display = 'block';
-                    document.getElementById('msgProcesando').innerText = "¿Qué desea hacer con los datos actuales?";
-                }, 1000);
-            }
-        } catch (e) {
-            alert("Error al generar el archivo. Intente de nuevo.");
-            document.getElementById('botonesModal').style.display = 'block';
+        await generarExcel(); 
+
+        if(limpiar) {
+            localStorage.removeItem('audit5S_text');
+            db.transaction("photos", "readwrite").objectStore("photos").clear();
+            document.getElementById('msgProcesando').innerText = "Archivo generado. Presione el botón verde para limpiar y empezar otra.";
+            document.getElementById('btnReiniciarManual').style.display = 'block';
+        } else {
+            setTimeout(() => {
+                document.getElementById('modalConfirm').style.display = 'none';
+                document.getElementById('botonesModal').style.display = 'block';
+                document.getElementById('msgProcesando').innerText = "¿Desea descargar el reporte?";
+            }, 2000);
         }
     }
 
@@ -287,7 +226,6 @@
             info[`nc${i}`] = (r && r.value !== 'NA') ? document.getElementById('obs-'+i).value : '';
         }
         const row = ws.addRow(info); row.height = 110;
-        const padding = 250000;
 
         for(let i=1; i<=preguntasData.length; i++) {
             const r = document.querySelector(`input[name="p${i}"]:checked`);
@@ -296,17 +234,58 @@
                 const startCol = 11 + (i-1)*5 + 2;
                 for(let f = 0; f < thumbs.length; f++) {
                     const imgId = wb.addImage({ base64: thumbs[f].dataset.base, extension: 'png' });
-                    ws.addImage(imgId, { tl: { col: startCol + f, row: row.number - 1, nativeColOff: padding, nativeRowOff: padding }, br: { col: startCol + f + 1, row: row.number, nativeColOff: -padding, nativeRowOff: -padding }, editAs: 'twoCell' });
+                    ws.addImage(imgId, { tl: { col: startCol + f, row: row.number - 1, nativeColOff: 250000, nativeRowOff: 250000 }, br: { col: startCol + f + 1, row: row.number, nativeColOff: -250000, nativeRowOff: -250000 }, editAs: 'twoCell' });
                 }
             }
         }
-
-        const fechaArchivo = fechaParaExcel.replace(/\//g, '-');
         const buffer = await wb.xlsx.writeBuffer();
+        const fechaArchivo = fechaParaExcel.replace(/\//g, '-');
         saveAs(new Blob([buffer]), `${fechaArchivo}-${info.l}-${info.a.toUpperCase()}.xlsx`);
     }
 
-    // --- FUNCIONES DB Y AUXILIARES ---
+    // --- FUNCIONES RESTANTES ---
+    function handleRadio(id, val) {
+        const box = document.getElementById('nc-'+id);
+        box.classList.remove('bueno', 'malo');
+        if (val === 'NA') box.style.display = 'none';
+        else {
+            box.style.display = 'block';
+            if(val === 'B') box.classList.add('bueno');
+            if(val === 'M') box.classList.add('malo');
+        }
+        verificarItemCompleto(id); guardarProgresoTexto();
+    }
+    function verificarItemCompleto(id) {
+        const r = document.querySelector(`input[name="p${id}"]:checked`);
+        if(!r) return;
+        const index = id - 1;
+        const esPersonal = (preguntasData[index].z === "PERSONAL");
+        const obsLen = document.getElementById('obs-'+id).value.trim().length;
+        const tieneFoto = document.getElementById('gal-'+id).children.length > 0;
+        let ok = true;
+        if(r.value === 'M') ok = (obsLen >= 3) && (esPersonal || tieneFoto);
+        else if(r.value === 'B') if(tieneFoto && obsLen < 3) ok = false;
+        if(ok) document.getElementById('card-'+id).classList.remove('error-resaltado');
+        guardarProgresoTexto();
+    }
+    function validarAuditoria() {
+        let error = false; let primerErr = null;
+        for(let i=1; i<=preguntasData.length; i++) {
+            const r = document.querySelector(`input[name="p${i}"]:checked`);
+            if(!r) { marcarError(i); continue; }
+            const esPersonal = (preguntasData[i-1].z === "PERSONAL");
+            const obsLen = document.getElementById('obs-'+i).value.trim().length;
+            const tieneFoto = document.getElementById('gal-'+i).children.length > 0;
+            let fail = (r.value==='M' && (obsLen < 3 || (!esPersonal && !tieneFoto))) || (r.value==='B' && tieneFoto && obsLen < 3);
+            if(fail) marcarError(i);
+        }
+        function marcarError(id) {
+            const card = document.getElementById('card-'+id); card.classList.add('error-resaltado');
+            if(!primerErr) primerErr = card; error = true;
+        }
+        if(error) { primerErr.scrollIntoView({behavior:'smooth', block:'center'}); return alert("⚠️ Error: Faltan comentarios o fotos obligatorias."); }
+        document.getElementById('modalConfirm').style.display = 'flex';
+    }
     function inicializar() {
         const ahora = new Date();
         document.getElementById('info-fecha').value = ahora.toISOString().split('T')[0];
@@ -322,8 +301,7 @@
         }
     }
     function dibujarThumb(idItem, base64, guardar) {
-        const div = document.createElement('div');
-        div.className = 'thumb-container'; div.dataset.base = base64;
+        const div = document.createElement('div'); div.className = 'thumb-container'; div.dataset.base = base64;
         div.innerHTML = `<img src="${base64}" class="thumb"><button class="btn-del" type="button" onclick="eliminarFoto(${idItem}, this)">×</button>`;
         document.getElementById('gal-'+idItem).appendChild(div);
         if(guardar) persistirFotosItem(idItem);
@@ -331,7 +309,7 @@
     function eliminarFoto(idItem, btn) { btn.parentElement.remove(); persistirFotosItem(idItem); verificarItemCompleto(idItem); }
     function persistirFotosItem(idItem) {
         const base64s = Array.from(document.getElementById('gal-'+idItem).children).map(c => c.dataset.base);
-        const tx = db.transaction("photos", "readwrite"); tx.objectStore("photos").put({ id: idItem, images: base64s });
+        db.transaction("photos", "readwrite").objectStore("photos").put({ id: idItem, images: base64s });
     }
     function irAPaso2() {
         const ids = ['info-auditor','info-fecha','info-hora','info-linea','info-regulador','info-operador','info-verificador','info-estado','info-op','info-lote'];
@@ -364,13 +342,11 @@
         }
     }
     function cargarFotosGuardadas() {
-        const tx = db.transaction("photos", "readonly");
-        tx.objectStore("photos").openCursor().onsuccess = e => {
+        db.transaction("photos", "readonly").objectStore("photos").openCursor().onsuccess = e => {
             const cursor = e.target.result;
             if (cursor) { cursor.value.images.forEach(base64 => dibujarThumb(cursor.value.id, base64, false)); cursor.continue(); }
         };
     }
-    function borrarFotosDB() { db.transaction("photos", "readwrite").objectStore("photos").clear(); }
 </script>
 </body>
 </html>
