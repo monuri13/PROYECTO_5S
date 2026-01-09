@@ -18,21 +18,19 @@
         label { font-size: 0.8rem; font-weight: bold; color: #5f6368; margin-bottom: 5px; text-transform: uppercase; }
         input, select, textarea { padding: 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 16px; width: 100%; box-sizing: border-box; }
         
-        /* ESTÉTICA DE SECCIONES - COLORES PASTEL */
         .zona-bloque { margin-top: 20px; border-radius: 12px; padding: 10px; border: 1px solid rgba(0,0,0,0.05); }
-        .zona-header { color: #2c3e50; padding: 12px 15px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; border-radius: 8px; font-size: 1.1rem; text-shadow: 1px 1px 0px rgba(255,255,255,0.5); }
+        .zona-header { color: #2c3e50; padding: 12px 15px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; border-radius: 8px; font-size: 1.1rem; }
         
-        /* Colores por zona */
-        .zona-materia-prima { background-color: #e8f5e9; } /* Verde menta */
-        .zona-formadora { background-color: #fff3e0; }    /* Naranja pastel */
-        .zona-transporte-1 { background-color: #f3e5f5; } /* Lavanda */
-        .zona-coche { background-color: #fffde7; }        /* Amarillo pastel */
-        .zona-horno { background-color: #fbe9e7; }         /* Salmón */
-        .zona-transporte-2 { background-color: #e0f7fa; } /* Cian/Turquesa */
-        .zona-mesa { background-color: #f5f5f5; }         /* Gris suave */
-        .zona-producto-terminado { background-color: #f9fbe7; } /* Lima */
-        .zona-linea-entorno { background-color: #efebe9; } /* Arena */
-        .zona-personal { background-color: #fce4ec; }      /* Rosa pastel */
+        .zona-materia-prima { background-color: #e8f5e9; } 
+        .zona-formadora { background-color: #fff3e0; }    
+        .zona-transporte-1 { background-color: #f3e5f5; } 
+        .zona-coche { background-color: #fffde7; }        
+        .zona-horno { background-color: #fbe9e7; }         
+        .zona-transporte-2 { background-color: #e0f7fa; } 
+        .zona-mesa { background-color: #f5f5f5; }         
+        .zona-producto-terminado { background-color: #f9fbe7; } 
+        .zona-linea-entorno { background-color: #efebe9; } 
+        .zona-personal { background-color: #fce4ec; }      
 
         .item-pregunta { padding: 15px; background: rgba(255,255,255,0.6); border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(0,0,0,0.03); }
         .error-resaltado { border: 3px dashed var(--danger) !important; background: #fff8f8 !important; }
@@ -62,9 +60,11 @@
 <div id="modalConfirm">
     <div class="modal-content">
         <h3>Auditoría Finalizada</h3>
-        <p>¿Qué desea hacer con los datos actuales?</p>
-        <button class="btn-blue" onclick="procesarFinal(true)">DESCARGAR Y LIMPIAR TODO</button>
-        <button class="btn-blue" style="background:#607d8b" onclick="procesarFinal(false)">SOLO DESCARGAR</button>
+        <p id="msgProcesando">¿Qué desea hacer con los datos actuales?</p>
+        <div id="botonesModal">
+            <button class="btn-blue" onclick="procesarFinal(true)">DESCARGAR Y LIMPIAR TODO</button>
+            <button class="btn-blue" style="background:#607d8b" onclick="procesarFinal(false)">SOLO DESCARGAR</button>
+        </div>
     </div>
 </div>
 
@@ -90,7 +90,6 @@
             </div>
             <button type="button" class="btn-blue" onclick="irAPaso2()">CONTINUAR EVALUACIÓN</button>
         </div>
-
         <div id="paso2" class="seccion">
             <div id="contenedor-preguntas"></div>
             <button type="button" id="btnFinalizar" class="btn-blue" style="background:var(--success)" onclick="validarAuditoria()">FINALIZAR Y DESCARGAR</button>
@@ -105,7 +104,7 @@
     request.onsuccess = e => { db = e.target.result; renderizar(); cargarProgresoTexto(); cargarFotosGuardadas(); };
 
     const preguntasData = [
-        {z: "MATERIA PRIMA", c: "zona-materia-prima", p: "¿No hay objetos innecesarios en la zona (herramientas, guantes, etc.) y solo se encuentra materia prima para la OP actual?"},
+        {z: "MATERIA PRIMA", c: "zona-materia-prima", p: "¿No hay objetos innecesarios en la zona y solo se encuentra materia prima para la OP actual?"},
         {z: "MATERIA PRIMA", c: "zona-materia-prima", p: "¿La materia prima y soporte tienen un lugar asignado y están ubicados correctemente?"},
         {z: "MATERIA PRIMA", c: "zona-materia-prima", p: "¿El área está limpia y libre de cartones, plásticos, polvo o residuos?"},
         {z: "MATERIA PRIMA", c: "zona-materia-prima", p: "¿Las delimitaciones y rótulos de la zona de materia prima están en buen estado?"},
@@ -154,25 +153,19 @@
         cont.innerHTML = "";
         let currentZ = "";
         let currentDivBloque = null;
-
         preguntasData.forEach((item, i) => {
             const id = i + 1;
             if(item.z !== currentZ) {
                 currentDivBloque = document.createElement('div');
                 currentDivBloque.className = 'zona-bloque ' + item.c;
-                const h = document.createElement('div');
-                h.className = 'zona-header';
-                h.innerText = item.z;
+                const h = document.createElement('div'); h.className = 'zona-header'; h.innerText = item.z;
                 currentDivBloque.appendChild(h);
                 cont.appendChild(currentDivBloque);
                 currentZ = item.z;
             }
-            
             const div = document.createElement('div');
-            div.className = 'item-pregunta';
-            div.id = `card-${id}`;
-            div.innerHTML = `
-                <p><strong>${id}.</strong> ${item.p}</p>
+            div.className = 'item-pregunta'; div.id = `card-${id}`;
+            div.innerHTML = `<p><strong>${id}.</strong> ${item.p}</p>
                 <div class="opciones-respuesta">
                     <input type="radio" name="p${id}" id="p${id}b" value="B" onclick="handleRadio(${id},'B')"><label class="opt-label" for="p${id}b">BUENO</label>
                     <input type="radio" name="p${id}" id="p${id}m" value="M" onclick="handleRadio(${id},'M')"><label class="opt-label" for="p${id}m">MALO</label>
@@ -237,16 +230,88 @@
             if(!primerErr) primerErr = card;
             error = true;
         }
-        if(error) { primerErr.scrollIntoView({behavior:'smooth', block:'center'}); return alert("⚠️ Error: Revise los campos obligatorios marcados en rojo."); }
+        if(error) { primerErr.scrollIntoView({behavior:'smooth', block:'center'}); return alert("⚠️ Error: Revise los campos obligatorios."); }
         document.getElementById('modalConfirm').style.display = 'flex';
     }
 
+    async function procesarFinal(limpiar) {
+        // Bloqueo de UI para evitar doble clic
+        document.getElementById('botonesModal').style.display = 'none';
+        document.getElementById('msgProcesando').innerText = "Generando archivo Excel... por favor espere.";
+        
+        try {
+            await generarExcel(); // Genera y descarga el archivo
+            
+            if(limpiar) {
+                // Espera un poco para que el navegador inicie la descarga antes de recargar
+                setTimeout(() => {
+                    localStorage.removeItem('audit5S_text');
+                    borrarFotosDB();
+                    document.getElementById('mainForm').reset();
+                    location.href = location.pathname;
+                }, 1500); 
+            } else {
+                // Si no se limpia, restaurar el modal
+                setTimeout(() => {
+                    document.getElementById('modalConfirm').style.display = 'none';
+                    document.getElementById('botonesModal').style.display = 'block';
+                    document.getElementById('msgProcesando').innerText = "¿Qué desea hacer con los datos actuales?";
+                }, 1000);
+            }
+        } catch (e) {
+            alert("Error al generar el archivo. Intente de nuevo.");
+            document.getElementById('botonesModal').style.display = 'block';
+        }
+    }
+
+    async function generarExcel() {
+        const wb = new ExcelJS.Workbook();
+        const ws = wb.addWorksheet('Auditoria');
+        const dInput = document.getElementById('info-fecha').value.split('-');
+        const fechaParaExcel = `${dInput[2]}/${dInput[1]}/${dInput[0].substring(2)}`;
+        const ahora = new Date();
+        const horaFin = ahora.getHours().toString().padStart(2, '0') + ':' + ahora.getMinutes().toString().padStart(2, '0');
+
+        let cols = [{header:'FECHA', key:'f', width:12},{header:'HORA INICIO', key:'hi', width:12},{header:'HORA FIN', key:'hf', width:12},{header:'AUDITOR', key:'a', width:20},{header:'LÍNEA', key:'l', width:10},{header:'REGULADOR', key:'reg', width:20},{header:'OPERADOR', key:'ope', width:20},{header:'VERIFICADOR', key:'ver', width:20},{header:'ESTADO', key:'est', width:15},{header:'OP', key:'op', width:12},{header:'LOTE', key:'lote', width:12}];
+        for(let i=1; i<=preguntasData.length; i++) {
+            const n = i < 10 ? '0'+i : i;
+            cols.push({header:`Item ${n}`, key:`p${i}`, width:10},{header:`Descripción ${n}`, key:`nc${i}`, width:25},{header:`Evidencia ${n}.1`, key:`e${i}_1`, width:20},{header:`Evidencia ${n}.2`, key:`e${i}_2`, width:20},{header:`Evidencia ${n}.3`, key:`e${i}_3`, width:20});
+        }
+        ws.columns = cols;
+
+        const info = { f: fechaParaExcel, hi: document.getElementById('info-hora').value, hf: horaFin, a: document.getElementById('info-auditor').value, l: document.getElementById('info-linea').value, reg: document.getElementById('info-regulador').value, ope: document.getElementById('info-operador').value.toUpperCase(), ver: document.getElementById('info-verificador').value.toUpperCase(), est: document.getElementById('info-estado').value, op: document.getElementById('info-op').value.toUpperCase(), lote: document.getElementById('info-lote').value.toUpperCase() };
+        
+        for(let i=1; i<=preguntasData.length; i++) {
+            const r = document.querySelector(`input[name="p${i}"]:checked`);
+            info[`p${i}`] = r ? r.value : '';
+            info[`nc${i}`] = (r && r.value !== 'NA') ? document.getElementById('obs-'+i).value : '';
+        }
+        const row = ws.addRow(info); row.height = 110;
+        const padding = 250000;
+
+        for(let i=1; i<=preguntasData.length; i++) {
+            const r = document.querySelector(`input[name="p${i}"]:checked`);
+            if (r && r.value !== 'NA') {
+                const thumbs = document.getElementById('gal-'+i).children;
+                const startCol = 11 + (i-1)*5 + 2;
+                for(let f = 0; f < thumbs.length; f++) {
+                    const imgId = wb.addImage({ base64: thumbs[f].dataset.base, extension: 'png' });
+                    ws.addImage(imgId, { tl: { col: startCol + f, row: row.number - 1, nativeColOff: padding, nativeRowOff: padding }, br: { col: startCol + f + 1, row: row.number, nativeColOff: -padding, nativeRowOff: -padding }, editAs: 'twoCell' });
+                }
+            }
+        }
+
+        const fechaArchivo = fechaParaExcel.replace(/\//g, '-');
+        const buffer = await wb.xlsx.writeBuffer();
+        saveAs(new Blob([buffer]), `${fechaArchivo}-${info.l}-${info.a.toUpperCase()}.xlsx`);
+    }
+
+    // --- FUNCIONES DB Y AUXILIARES ---
     function inicializar() {
         const ahora = new Date();
         document.getElementById('info-fecha').value = ahora.toISOString().split('T')[0];
         document.getElementById('info-hora').value = ahora.toTimeString().split(' ')[0].substring(0, 5);
     }
-
     function subirFoto(id, input) {
         const gal = document.getElementById('gal-'+id);
         if (gal.children.length >= 3) return alert("Máximo 3 fotos.");
@@ -256,7 +321,6 @@
             reader.readAsDataURL(input.files[0]);
         }
     }
-
     function dibujarThumb(idItem, base64, guardar) {
         const div = document.createElement('div');
         div.className = 'thumb-container'; div.dataset.base = base64;
@@ -264,14 +328,11 @@
         document.getElementById('gal-'+idItem).appendChild(div);
         if(guardar) persistirFotosItem(idItem);
     }
-
     function eliminarFoto(idItem, btn) { btn.parentElement.remove(); persistirFotosItem(idItem); verificarItemCompleto(idItem); }
-    
     function persistirFotosItem(idItem) {
         const base64s = Array.from(document.getElementById('gal-'+idItem).children).map(c => c.dataset.base);
         const tx = db.transaction("photos", "readwrite"); tx.objectStore("photos").put({ id: idItem, images: base64s });
     }
-
     function irAPaso2() {
         const ids = ['info-auditor','info-fecha','info-hora','info-linea','info-regulador','info-operador','info-verificador','info-estado','info-op','info-lote'];
         let err = false;
@@ -284,7 +345,6 @@
         document.getElementById('paso2').classList.add('active');
         window.scrollTo(0,0);
     }
-
     function quitarError(el) { el.classList.remove('error-resaltado'); guardarProgresoTexto(); }
     function guardarProgresoTexto() {
         const data = {};
@@ -311,53 +371,6 @@
         };
     }
     function borrarFotosDB() { db.transaction("photos", "readwrite").objectStore("photos").clear(); }
-
-    async function procesarFinal(limpiar) {
-        document.getElementById('modalConfirm').style.display = 'none';
-        await generarExcel();
-        if(limpiar) {
-            localStorage.removeItem('audit5S_text');
-            borrarFotosDB();
-            document.getElementById('mainForm').reset();
-            setTimeout(() => { location.href = location.pathname; }, 600);
-        }
-    }
-
-    async function generarExcel() {
-        const wb = new ExcelJS.Workbook();
-        const ws = wb.addWorksheet('Auditoria');
-        const dInput = document.getElementById('info-fecha').value.split('-');
-        const fechaParaExcel = `${dInput[2]}/${dInput[1]}/${dInput[0].substring(2)}`;
-        const ahora = new Date();
-        const horaFin = ahora.getHours().toString().padStart(2, '0') + ':' + ahora.getMinutes().toString().padStart(2, '0');
-        let cols = [{header:'FECHA', key:'f', width:12},{header:'HORA INICIO', key:'hi', width:12},{header:'HORA FIN', key:'hf', width:12},{header:'AUDITOR', key:'a', width:20},{header:'LÍNEA', key:'l', width:10},{header:'REGULADOR', key:'reg', width:20},{header:'OPERADOR', key:'ope', width:20},{header:'VERIFICADOR', key:'ver', width:20},{header:'ESTADO', key:'est', width:15},{header:'OP', key:'op', width:12},{header:'LOTE', key:'lote', width:12}];
-        for(let i=1; i<=preguntasData.length; i++) {
-            const n = i < 10 ? '0'+i : i;
-            cols.push({header:`Item ${n}`, key:`p${i}`, width:10},{header:`Descripción ${n}`, key:`nc${i}`, width:25},{header:`Evidencia ${n}.1`, key:`e${i}_1`, width:20},{header:`Evidencia ${n}.2`, key:`e${i}_2`, width:20},{header:`Evidencia ${n}.3`, key:`e${i}_3`, width:20});
-        }
-        ws.columns = cols;
-        const info = { f: fechaParaExcel, hi: document.getElementById('info-hora').value, hf: horaFin, a: document.getElementById('info-auditor').value, l: document.getElementById('info-linea').value, reg: document.getElementById('info-regulador').value, ope: document.getElementById('info-operador').value.toUpperCase(), ver: document.getElementById('info-verificador').value.toUpperCase(), est: document.getElementById('info-estado').value, op: document.getElementById('info-op').value.toUpperCase(), lote: document.getElementById('info-lote').value.toUpperCase() };
-        for(let i=1; i<=preguntasData.length; i++) {
-            const r = document.querySelector(`input[name="p${i}"]:checked`);
-            info[`p${i}`] = r ? r.value : '';
-            info[`nc${i}`] = (r && r.value !== 'NA') ? document.getElementById('obs-'+i).value : '';
-        }
-        const row = ws.addRow(info); row.height = 110;
-        const padding = 250000;
-        for(let i=1; i<=preguntasData.length; i++) {
-            const r = document.querySelector(`input[name="p${i}"]:checked`);
-            if (r && r.value !== 'NA') {
-                const thumbs = document.getElementById('gal-'+i).children;
-                const startCol = 11 + (i-1)*5 + 2;
-                for(let f = 0; f < thumbs.length; f++) {
-                    const imgId = wb.addImage({ base64: thumbs[f].dataset.base, extension: 'png' });
-                    ws.addImage(imgId, { tl: { col: startCol + f, row: row.number - 1, nativeColOff: padding, nativeRowOff: padding }, br: { col: startCol + f + 1, row: row.number, nativeColOff: -padding, nativeRowOff: -padding }, editAs: 'twoCell' });
-                }
-            }
-        }
-        const fechaArchivo = fechaParaExcel.replace(/\//g, '-');
-        saveAs(new Blob([await wb.xlsx.writeBuffer()]), `${fechaArchivo}-${info.l}-${info.a.toUpperCase()}.xlsx`);
-    }
 </script>
 </body>
 </html>
