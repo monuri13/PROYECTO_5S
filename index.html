@@ -17,18 +17,34 @@
         .field { display: flex; flex-direction: column; margin-bottom: 10px; }
         label { font-size: 0.8rem; font-weight: bold; color: #5f6368; margin-bottom: 5px; text-transform: uppercase; }
         input, select, textarea { padding: 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 16px; width: 100%; box-sizing: border-box; }
-        .zona-header { background: #34495e; color: white; padding: 12px 15px; font-weight: bold; text-transform: uppercase; margin-top: 20px; border-radius: 4px; }
-        .item-pregunta { padding: 15px; border-bottom: 1px solid #f1f3f4; background: white; border: 2px solid transparent; border-radius: 8px; margin-bottom: 5px; }
+        
+        /* Estilos de las Zonas y Colores Pasteles */
+        .zona-header { background: #34495e; color: white; padding: 12px 15px; font-weight: bold; text-transform: uppercase; margin-top: 20px; border-radius: 4px 4px 0 0; }
+        .item-pregunta { padding: 15px; border-bottom: 1px solid rgba(0,0,0,0.05); border: 2px solid transparent; }
+        
+        .color-zona-0 { background-color: #e8f0fe; } /* Azul */
+        .color-zona-1 { background-color: #fef7e0; } /* Amarillo */
+        .color-zona-2 { background-color: #f3e5f5; } /* Lavanda */
+        .color-zona-3 { background-color: #e0f2f1; } /* Cian */
+        .color-zona-4 { background-color: #fff3e0; } /* Naranja */
+        .color-zona-5 { background-color: #fce4ec; } /* Rosa */
+        .color-zona-6 { background-color: #e1f5fe; } /* Celeste */
+        .color-zona-7 { background-color: #efebe9; } /* Arena */
+        .color-zona-8 { background-color: #f9fbe7; } /* Lima */
+        .color-zona-9 { background-color: #ede7f6; } /* Violeta */
+
         .error-resaltado { border: 3px dashed var(--danger) !important; background: #fff8f8 !important; }
         .opciones-respuesta { display: flex; gap: 8px; margin-top: 10px; }
-        .opt-label { flex: 1; text-align: center; padding: 10px; border: 1px solid #dadce0; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; min-height: 45px; }
+        .opt-label { flex: 1; text-align: center; padding: 10px; border: 1px solid #dadce0; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; min-height: 45px; background: white; }
         input[type="radio"] { display: none; }
         input[value="B"]:checked + .opt-label { background: var(--success); color: white; border-color: var(--success); }
         input[value="M"]:checked + .opt-label { background: var(--danger); color: white; border-color: var(--danger); }
         input[value="NA"]:checked + .opt-label { background: var(--na); color: white; border-color: var(--na); }
-        .nc-box { display: none; background: #f1f3f4; padding: 15px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #bdc3c7; }
-        .nc-box.malo { background: #fff5f5; border-left-color: var(--danger); }
-        .nc-box.bueno { background: #f0f7ff; border-left-color: var(--primary); }
+        
+        .nc-box { display: none; background: rgba(255,255,255,0.6); padding: 15px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #bdc3c7; }
+        .nc-box.malo { border-left-color: var(--danger); background: #fffafa; }
+        .nc-box.bueno { border-left-color: var(--primary); background: #f8fbff; }
+
         .gallery { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
         .thumb-container { position: relative; width: 80px; height: 80px; }
         .thumb { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; border: 1px solid #ccc; }
@@ -60,17 +76,10 @@
                 </div>
                 <div class="field"><label>AUDITOR *</label><select id="info-auditor" onchange="quitarError(this)">
                     <option value="">Seleccione...</option>
-                    <option>MANUEL YUCRA</option>
-                    <option>BLADIMIR PALACIOS</option>
-                    <option>CHRISTIAN VARGAS</option>
-                    <option>SANDRA DIAZ</option>
-                    <option>EDWIN MARIANO</option>
-                    <option>STEPHANIE QUISPE</option>
-                    <option>HENRY EULOGIO</option>
-                    <option>JEROL ROJAS</option>
-                    <option>EDUAR MONSALVE</option>
-                    <option>VICTOR PAREDES</option>
-                    <option>JULIO MORE</option>
+                    <option>MANUEL YUCRA</option><option>BLADIMIR PALACIOS</option><option>CHRISTIAN VARGAS</option>
+                    <option>SANDRA DIAZ</option><option>EDWIN MARIANO</option><option>STEPHANIE QUISPE</option>
+                    <option>HENRY EULOGIO</option><option>JEROL ROJAS</option><option>EDUAR MONSALVE</option>
+                    <option>VICTOR PAREDES</option><option>JULIO MORE</option>
                 </select></div>
                 <div class="field"><label>FECHA *</label><input type="date" id="info-fecha" onchange="quitarError(this)"></div>
                 <div class="field"><label>HORA INICIO *</label><input type="time" id="info-hora" onchange="quitarError(this)"></div>
@@ -90,11 +99,7 @@
             </div>
             <button type="button" class="btn-blue" onclick="irAPaso2()">CONTINUAR EVALUACIÓN</button>
         </div>
-
-        <div id="paso2" class="seccion">
-            <div id="contenedor-preguntas"></div>
-            <button type="button" id="btnFinalizar" class="btn-blue" style="background:var(--success)" onclick="validarAuditoria()">FINALIZAR Y DESCARGAR</button>
-        </div>
+        <div id="paso2" class="seccion"><div id="contenedor-preguntas"></div><button type="button" id="btnFinalizar" class="btn-blue" style="background:var(--success)" onclick="validarAuditoria()">FINALIZAR Y DESCARGAR</button></div>
     </form>
 </div>
 
@@ -150,12 +155,17 @@
 
     function renderizar() {
         const cont = document.getElementById('contenedor-preguntas');
-        cont.innerHTML = ""; let currentZ = "";
+        cont.innerHTML = ""; let currentZ = ""; let zonaIdx = -1;
         preguntasData.forEach((item, i) => {
             const id = i + 1;
-            if(item.z !== currentZ) { const h = document.createElement('div'); h.className='zona-header'; h.innerText=item.z; cont.appendChild(h); currentZ=item.z; }
-            const div = document.createElement('div'); div.className='item-pregunta'; div.id=`card-${id}`;
-            div.innerHTML = `<p><strong>${id}.</strong> ${item.p}</p><div class="opciones-respuesta"><input type="radio" name="p${id}" id="p${id}b" value="B" onclick="handleRadio(${id},'B')"><label class="opt-label" for="p${id}b">BUENO</label><input type="radio" name="p${id}" id="p${id}m" value="M" onclick="handleRadio(${id},'M')"><label class="opt-label" for="p${id}m">MALO</label><input type="radio" name="p${id}" id="p${id}na" value="NA" onclick="handleRadio(${id},'NA')"><label class="opt-label" for="p${id}na">NA</label></div><div id="nc-${id}" class="nc-box"><textarea id="obs-${id}" placeholder="Comentario obligatorio si hay fotos o si es MALO..." oninput="verificarItemCompleto(${id})"></textarea><div class="gallery" id="gal-${id}"></div><label style="background:#555;color:white;padding:12px;border-radius:4px;display:block;text-align:center;margin-top:10px;font-size:0.9rem;cursor:pointer;">📷 AÑADIR FOTO (MÁX 3)<input type="file" accept="image/*" capture="environment" style="display:none" onchange="subirFoto(${id}, this)"></label></div>`;
+            if(item.z !== currentZ) { 
+                zonaIdx++;
+                const h = document.createElement('div'); h.className='zona-header'; h.innerText=item.z; cont.appendChild(h); currentZ=item.z; 
+            }
+            const div = document.createElement('div'); 
+            div.className=`item-pregunta color-zona-${zonaIdx % 10}`; 
+            div.id=`card-${id}`;
+            div.innerHTML = `<p><strong>${id}.</strong> ${item.p}</p><div class="opciones-respuesta"><input type="radio" name="p${id}" id="p${id}b" value="B" onclick="handleRadio(${id},'B')"><label class="opt-label" for="p${id}b">BUENO</label><input type="radio" name="p${id}" id="p${id}m" value="M" onclick="handleRadio(${id},'M')"><label class="opt-label" for="p${id}m">MALO</label><input type="radio" name="p${id}" id="p${id}na" value="NA" onclick="handleRadio(${id},'NA')"><label class="opt-label" for="p${id}na">NA</label></div><div id="nc-${id}" class="nc-box"><textarea id="obs-${id}" placeholder="Comentario..." oninput="verificarItemCompleto(${id})"></textarea><div class="gallery" id="gal-${id}"></div><label style="background:#555;color:white;padding:12px;border-radius:4px;display:block;text-align:center;margin-top:10px;font-size:0.9rem;cursor:pointer;">📷 FOTO (MÁX 3)<input type="file" accept="image/*" capture="environment" style="display:none" onchange="subirFoto(${id}, this)"></label></div>`;
             cont.appendChild(div);
         });
     }
@@ -168,12 +178,37 @@
     function eliminarFoto(idItem, btn) { btn.parentElement.remove(); persistirFotosItem(idItem); verificarItemCompleto(idItem); }
     function persistirFotosItem(idItem) { const base64s = Array.from(document.getElementById('gal-'+idItem).children).map(c => c.dataset.base); salvarFotoDB(idItem, base64s); }
     function subirFoto(id, input) { const gal = document.getElementById('gal-'+id); if (gal.children.length >= 3) { alert("⚠️ BLOQUEO: Solo se permiten máximo 3 fotos."); return; } if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = e => { dibujarThumb(id, e.target.result, true); verificarItemCompleto(id); }; reader.readAsDataURL(input.files[0]); } }
-    function handleRadio(id, val) { const box = document.getElementById('nc-'+id); box.classList.remove('bueno', 'malo'); if (val === 'NA') box.style.display = 'none'; else { box.style.display = 'block'; if(val === 'B') box.classList.add('bueno'); if(val === 'M') box.classList.add('malo'); } verificarItemCompleto(id); guardarProgresoTexto(); }
-    function verificarItemCompleto(id) { const r = document.querySelector(`input[name="p${id}"]:checked`); const card = document.getElementById('card-'+id); if(!r) return; const index = id - 1; const esPersonal = (preguntasData[index].z === "PERSONAL"); const obsLen = document.getElementById('obs-'+id).value.trim().length; const tieneFoto = document.getElementById('gal-'+id).children.length > 0; let ok = true; if(tieneFoto && obsLen < 3) ok = false; if(r.value === 'M' && (obsLen < 3 || (!esPersonal && !tieneFoto))) ok = false; if(ok) card.classList.remove('error-resaltado'); guardarProgresoTexto(); }
+    
+    function handleRadio(id, val) { 
+        const box = document.getElementById('nc-'+id); 
+        box.classList.remove('bueno', 'malo'); 
+        if (val === 'NA') box.style.display = 'none'; 
+        else { 
+            box.style.display = 'block'; 
+            if(val === 'B') box.classList.add('bueno'); 
+            if(val === 'M') box.classList.add('malo'); 
+        } 
+        verificarItemCompleto(id); 
+        guardarProgresoTexto(); 
+    }
+
+    function verificarItemCompleto(id) { 
+        const r = document.querySelector(`input[name="p${id}"]:checked`); 
+        const card = document.getElementById('card-'+id); 
+        if(!r) return; 
+        const esPersonal = (preguntasData[id-1].z === "PERSONAL"); 
+        const obsLen = document.getElementById('obs-'+id).value.trim().length; 
+        const tieneFoto = document.getElementById('gal-'+id).children.length > 0; 
+        let ok = true; 
+        if(tieneFoto && obsLen < 3) ok = false; 
+        if(r.value === 'M' && (obsLen < 3 || (!esPersonal && !tieneFoto))) ok = false; 
+        if(ok) card.classList.remove('error-resaltado'); 
+        guardarProgresoTexto(); 
+    }
 
     function irAPaso2() { 
-        const opVal = document.getElementById('info-op').value.trim();
-        const auditIn = document.getElementById('info-nro-audit').value;
+        const opVal = document.getElementById('info-op').value.trim(); 
+        const auditIn = document.getElementById('info-nro-audit').value; 
         const ids = ['info-nro-audit','info-auditor','info-fecha','info-hora','info-linea','info-regulador','info-operador','info-verificador','info-estado','info-op','info-lote']; 
         let err = false; 
         ids.forEach(id => { 
@@ -203,11 +238,19 @@
                 if(!primerErr) primerErr = card; error = true; 
             } 
         } 
-        if(error) { primerErr.scrollIntoView({behavior:'smooth', block:'center'}); return alert("⚠️ Faltan datos o fotos en MALO / Comentarios en fotos."); } 
+        if(error) { primerErr.scrollIntoView({behavior:'smooth', block:'center'}); return alert("⚠️ Faltan datos o fotos obligatorias."); } 
         document.getElementById('modalConfirm').style.display = 'flex'; 
     }
 
-    async function procesarFinal(limpiar) { document.getElementById('modalConfirm').style.display = 'none'; await generarExcel(); if(limpiar) { localStorage.removeItem('audit5S_text'); borrarFotosDB(); location.reload(); } }
+    async function procesarFinal(limpiar) { 
+        document.getElementById('modalConfirm').style.display = 'none'; 
+        await generarExcel(); 
+        if(limpiar) { 
+            localStorage.removeItem('audit5S_text'); 
+            borrarFotosDB(); 
+            location.reload(); 
+        } 
+    }
 
     async function generarExcel() {
         const wb = new ExcelJS.Workbook();
@@ -218,25 +261,10 @@
         const nAudit = document.getElementById('info-nro-audit').value;
         const linea = document.getElementById('info-linea').value;
 
-        let cols = [
-            {header:'COLUMNA CLAVE', key:'clave', width:20},
-            {header:'NRO AUDITORÍA', key:'nra', width:15},
-            {header:'FECHA', key:'f', width:12},
-            {header:'HORA INICIO', key:'hi', width:12},
-            {header:'HORA FIN', key:'hf', width:12},
-            {header:'AUDITOR', key:'a', width:20},
-            {header:'LÍNEA', key:'l', width:10},
-            {header:'REGULADOR', key:'reg', width:20},
-            {header:'OPERADOR', key:'ope', width:20},
-            {header:'VERIFICADOR', key:'ver', width:20},
-            {header:'ESTADO', key:'est', width:15},
-            {header:'OP', key:'op', width:12},
-            {header:'LOTE', key:'lote', width:12}
-        ];
-
+        let cols = [{header:'COLUMNA CLAVE', key:'clave', width:20},{header:'NRO AUDITORÍA', key:'nra', width:15},{header:'FECHA', key:'f', width:12},{header:'HORA INICIO', key:'hi', width:12},{header:'HORA FIN', key:'hf', width:12},{header:'AUDITOR', key:'a', width:20},{header:'LÍNEA', key:'l', width:10},{header:'REGULADOR', key:'reg', width:20},{header:'OPERADOR', key:'ope', width:20},{header:'VERIFICADOR', key:'ver', width:20},{header:'ESTADO', key:'est', width:15},{header:'OP', key:'op', width:12},{header:'LOTE', key:'lote', width:12}];
         for(let i=1; i<=preguntasData.length; i++) {
             const n = i < 10 ? '0'+i : i;
-            cols.push({header:`Item ${n}`, key:`p${i}`, width:10},{header:`Descripción ${n}`, key:`nc${i}`, width:25},{header:`Evidencia ${n}.1`, key:`e${i}_1`, width:22},{header:`Evidencia ${n}.2`, key:`e${i}_2`, width:22},{header:`Evidencia ${n}.3`, key:`e${i}_3`, width:22});
+            cols.push({header:`Item ${n}`, key:`p${i}`, width:10},{header:`Descripción ${n}`, key:`nc${i}`, width:25},{header:`Evidencia ${n}.1`, key:`e${i}_1`, width:25},{header:`Evidencia ${n}.2`, key:`e${i}_2`, width:25},{header:`Evidencia ${n}.3`, key:`e${i}_3`, width:25});
         }
         ws.columns = cols;
 
@@ -244,17 +272,12 @@
 
         for(let i=1; i<=preguntasData.length; i++) { 
             const r = document.querySelector(`input[name="p${i}"]:checked`); 
-            let valRes = '';
-            if (r) {
-                if (r.value === 'B') valRes = 'BUENO';
-                else if (r.value === 'M') valRes = 'MALO';
-                else if (r.value === 'NA') valRes = 'NO APLICA'; // MODIFICACIÓN ÍTEMS
-            }
-            info[`p${i}`] = valRes;
+            let res = r ? (r.value==='B'?'BUENO':(r.value==='M'?'MALO':'NO APLICA')) : '';
+            info[`p${i}`] = res;
             info[`nc${i}`] = (r && r.value !== 'NA') ? document.getElementById('obs-'+i).value : ''; 
         }
         
-        const row = ws.addRow(info); row.height = 120;
+        const row = ws.addRow(info); row.height = 140;
 
         for(let i=1; i<=preguntasData.length; i++) {
             const r = document.querySelector(`input[name="p${i}"]:checked`);
@@ -264,8 +287,8 @@
                 for(let f = 0; f < thumbs.length; f++) {
                     const imgId = wb.addImage({ base64: thumbs[f].dataset.base, extension: 'png' });
                     ws.addImage(imgId, {
-                        tl: { col: startCol + f, row: row.number - 1, nativeColOff: 5 * 9525, nativeRowOff: 5 * 9525 },
-                        br: { col: startCol + f + 1, row: row.number, nativeColOff: -5 * 9525, nativeRowOff: -5 * 9525 },
+                        tl: { col: startCol + f, row: row.number - 1 },
+                        br: { col: startCol + f + 1, row: row.number },
                         editAs: 'oneCell'
                     });
                 }
