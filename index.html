@@ -17,35 +17,18 @@
         .field { display: flex; flex-direction: column; margin-bottom: 10px; }
         label { font-size: 0.8rem; font-weight: bold; color: #5f6368; margin-bottom: 5px; text-transform: uppercase; }
         input, select, textarea { padding: 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 16px; width: 100%; box-sizing: border-box; }
-        
-        /* Estilos de las Zonas */
-        .zona-header { background: #34495e; color: white; padding: 12px 15px; font-weight: bold; text-transform: uppercase; margin-top: 20px; border-radius: 4px 4px 0 0; }
-        .item-pregunta { padding: 15px; border-bottom: 1px solid rgba(0,0,0,0.05); border: 2px solid transparent; margin-bottom: 0; }
-        
-        /* Colores Pasteles por Sección (Evitando Rojo y Verde) */
-        .color-zona-0 { background-color: #e8f0fe; } /* Azul suave */
-        .color-zona-1 { background-color: #fef7e0; } /* Amarillo suave */
-        .color-zona-2 { background-color: #f3e5f5; } /* Lavanda */
-        .color-zona-3 { background-color: #e0f2f1; } /* Cian suave */
-        .color-zona-4 { background-color: #fff3e0; } /* Naranja suave */
-        .color-zona-5 { background-color: #fce4ec; } /* Rosa suave (no rojo) */
-        .color-zona-6 { background-color: #e1f5fe; } /* Celeste */
-        .color-zona-7 { background-color: #efebe9; } /* Gris cálido / Arena */
-        .color-zona-8 { background-color: #f9fbe7; } /* Lima muy suave (no verde) */
-        .color-zona-9 { background-color: #ede7f6; } /* Violeta suave */
-
+        .zona-header { background: #34495e; color: white; padding: 12px 15px; font-weight: bold; text-transform: uppercase; margin-top: 20px; border-radius: 4px; }
+        .item-pregunta { padding: 15px; border-bottom: 1px solid #f1f3f4; background: white; border: 2px solid transparent; border-radius: 8px; margin-bottom: 5px; }
         .error-resaltado { border: 3px dashed var(--danger) !important; background: #fff8f8 !important; }
         .opciones-respuesta { display: flex; gap: 8px; margin-top: 10px; }
-        .opt-label { flex: 1; text-align: center; padding: 10px; border: 1px solid #dadce0; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; min-height: 45px; background: white; }
+        .opt-label { flex: 1; text-align: center; padding: 10px; border: 1px solid #dadce0; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; min-height: 45px; }
         input[type="radio"] { display: none; }
         input[value="B"]:checked + .opt-label { background: var(--success); color: white; border-color: var(--success); }
         input[value="M"]:checked + .opt-label { background: var(--danger); color: white; border-color: var(--danger); }
         input[value="NA"]:checked + .opt-label { background: var(--na); color: white; border-color: var(--na); }
-        
-        .nc-box { display: none; background: rgba(255,255,255,0.6); padding: 15px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #bdc3c7; }
-        .nc-box.malo { border-left-color: var(--danger); background: #fffafa; }
-        .nc-box.bueno { border-left-color: var(--primary); background: #f8fbff; }
-
+        .nc-box { display: none; background: #f1f3f4; padding: 15px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #bdc3c7; }
+        .nc-box.malo { background: #fff5f5; border-left-color: var(--danger); }
+        .nc-box.bueno { background: #f0f7ff; border-left-color: var(--primary); }
         .gallery { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
         .thumb-container { position: relative; width: 80px; height: 80px; }
         .thumb { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; border: 1px solid #ccc; }
@@ -72,10 +55,23 @@
         <div id="paso1" class="seccion active">
             <div class="grid-header">
                 <div class="field">
-                    <label>NRO DE AUDITORÍA*</label>
+                    <label>NRO DE AUDITORÍA (ENTERO > 0) *</label>
                     <input type="number" id="info-nro-audit" min="1" step="1" placeholder="Ej: 1, 2, 3..." oninput="quitarError(this)">
                 </div>
-                <div class="field"><label>AUDITOR *</label><select id="info-auditor" onchange="quitarError(this)"><option value="">Seleccione...</option><option>MANUEL YUCRA</option><option>BLADIMIR PALACIOS</option><option>CHRISTIAN VARGAS</option><option>SANDRA DIAZ</option><option>EDWIN MARIANO</option><option>STEPHANIE QUISPE</option><option>HENRY EULOGIO</option><option>JEROL ROJAS</option><option>EDUAR MONSALVE</option><option>VICTOR PAREDES</option><option>JULIO MORE</option></select></div>
+                <div class="field"><label>AUDITOR *</label><select id="info-auditor" onchange="quitarError(this)">
+                    <option value="">Seleccione...</option>
+                    <option>MANUEL YUCRA</option>
+                    <option>BLADIMIR PALACIOS</option>
+                    <option>CHRISTIAN VARGAS</option>
+                    <option>SANDRA DIAZ</option>
+                    <option>EDWIN MARIANO</option>
+                    <option>STEPHANIE QUISPE</option>
+                    <option>HENRY EULOGIO</option>
+                    <option>JEROL ROJAS</option>
+                    <option>EDUAR MONSALVE</option>
+                    <option>VICTOR PAREDES</option>
+                    <option>JULIO MORE</option>
+                </select></div>
                 <div class="field"><label>FECHA *</label><input type="date" id="info-fecha" onchange="quitarError(this)"></div>
                 <div class="field"><label>HORA INICIO *</label><input type="time" id="info-hora" onchange="quitarError(this)"></div>
                 <div class="field"><label>LÍNEA *</label><select id="info-linea" onchange="quitarError(this)"><option value="">Seleccione...</option><option>MA-01</option><option>MA-02</option><option>MA-03</option><option>MA-04</option><option>MA-05</option><option>MA-06</option><option>MA-08</option><option>MA-09</option><option>MA-10</option><option>FV-01</option><option>FV-03</option><option>FV-04</option><option>FV-05</option><option>FV-06</option></select></div>
@@ -136,8 +132,8 @@
         {z: "MESA DE REVISIÓN", p: "¿Los elementos están ubicados en su lugar asignado?"},
         {z: "MESA DE REVISIÓN", p: "La mesa y su área se perciben limpios"},
         {z: "MESA DE REVISIÓN", p: "¿La instalaciones, delimitaciones y rótulos se encuentran en buen estado?"},
-        {z: "ZONA DE PRODUCTO TERMINADO", p: "No se observan objetos innecesarios en el área de la parihuela?"},
-        {z: "ZONA DE PRODUCTO TERMINADO", p: "¿El producto terminado tiene un lugar asignado?"},
+        {z: "ZONA DE PRODUCTO TERMINADO", p: "No se observan objetos innecesarios en el área de la parihuela y solo lo ocupa un tipo de producto"},
+        {z: "ZONA DE PRODUCTO TERMINADO", p: "¿El producto terminado tiene un lugar asignado y está ubicado correctemente ?"},
         {z: "ZONA DE PRODUCTO TERMINADO", p: "¿Cada bandeja esta identificada con su sticker?"},
         {z: "ZONA DE PRODUCTO TERMINADO", p: "Los elementos de la zona y el piso están limpios?"},
         {z: "ZONA DE PRODUCTO TERMINADO", p: "¿Las delimitacion y rotulo de la zona están en buen estado?"},
@@ -155,18 +151,11 @@
     function renderizar() {
         const cont = document.getElementById('contenedor-preguntas');
         cont.innerHTML = ""; let currentZ = "";
-        let zonaIndex = -1;
-
         preguntasData.forEach((item, i) => {
             const id = i + 1;
-            if(item.z !== currentZ) { 
-                zonaIndex++;
-                const h = document.createElement('div'); h.className='zona-header'; h.innerText=item.z; cont.appendChild(h); currentZ=item.z; 
-            }
-            const div = document.createElement('div'); 
-            div.className = `item-pregunta color-zona-${zonaIndex % 10}`; 
-            div.id=`card-${id}`;
-            div.innerHTML = `<p><strong>${id}.</strong> ${item.p}</p><div class="opciones-respuesta"><input type="radio" name="p${id}" id="p${id}b" value="B" onclick="handleRadio(${id},'B')"><label class="opt-label" for="p${id}b">BUENO</label><input type="radio" name="p${id}" id="p${id}m" value="M" onclick="handleRadio(${id},'M')"><label class="opt-label" for="p${id}m">MALO</label><input type="radio" name="p${id}" id="p${id}na" value="NA" onclick="handleRadio(${id},'NA')"><label class="opt-label" for="p${id}na">NA</label></div><div id="nc-${id}" class="nc-box"><textarea id="obs-${id}" placeholder="Descripción..." oninput="verificarItemCompleto(${id})"></textarea><div class="gallery" id="gal-${id}"></div><label style="background:#555;color:white;padding:12px;border-radius:4px;display:block;text-align:center;margin-top:10px;font-size:0.9rem;cursor:pointer;">📷 AÑADIR FOTO (MÁX 3)<input type="file" accept="image/*" capture="environment" style="display:none" onchange="subirFoto(${id}, this)"></label></div>`;
+            if(item.z !== currentZ) { const h = document.createElement('div'); h.className='zona-header'; h.innerText=item.z; cont.appendChild(h); currentZ=item.z; }
+            const div = document.createElement('div'); div.className='item-pregunta'; div.id=`card-${id}`;
+            div.innerHTML = `<p><strong>${id}.</strong> ${item.p}</p><div class="opciones-respuesta"><input type="radio" name="p${id}" id="p${id}b" value="B" onclick="handleRadio(${id},'B')"><label class="opt-label" for="p${id}b">BUENO</label><input type="radio" name="p${id}" id="p${id}m" value="M" onclick="handleRadio(${id},'M')"><label class="opt-label" for="p${id}m">MALO</label><input type="radio" name="p${id}" id="p${id}na" value="NA" onclick="handleRadio(${id},'NA')"><label class="opt-label" for="p${id}na">NA</label></div><div id="nc-${id}" class="nc-box"><textarea id="obs-${id}" placeholder="Comentario obligatorio si hay fotos o si es MALO..." oninput="verificarItemCompleto(${id})"></textarea><div class="gallery" id="gal-${id}"></div><label style="background:#555;color:white;padding:12px;border-radius:4px;display:block;text-align:center;margin-top:10px;font-size:0.9rem;cursor:pointer;">📷 AÑADIR FOTO (MÁX 3)<input type="file" accept="image/*" capture="environment" style="display:none" onchange="subirFoto(${id}, this)"></label></div>`;
             cont.appendChild(div);
         });
     }
@@ -180,29 +169,22 @@
     function persistirFotosItem(idItem) { const base64s = Array.from(document.getElementById('gal-'+idItem).children).map(c => c.dataset.base); salvarFotoDB(idItem, base64s); }
     function subirFoto(id, input) { const gal = document.getElementById('gal-'+id); if (gal.children.length >= 3) { alert("⚠️ BLOQUEO: Solo se permiten máximo 3 fotos."); return; } if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = e => { dibujarThumb(id, e.target.result, true); verificarItemCompleto(id); }; reader.readAsDataURL(input.files[0]); } }
     function handleRadio(id, val) { const box = document.getElementById('nc-'+id); box.classList.remove('bueno', 'malo'); if (val === 'NA') box.style.display = 'none'; else { box.style.display = 'block'; if(val === 'B') box.classList.add('bueno'); if(val === 'M') box.classList.add('malo'); } verificarItemCompleto(id); guardarProgresoTexto(); }
-    function verificarItemCompleto(id) { const r = document.querySelector(`input[name="p${id}"]:checked`); const card = document.getElementById('card-'+id); if(!r) return; const esPersonal = (preguntasData[id-1].z === "PERSONAL"); const obsLen = document.getElementById('obs-'+id).value.trim().length; const tieneFoto = document.getElementById('gal-'+id).children.length > 0; let ok = true; if(tieneFoto && obsLen < 3) ok = false; if(r.value === 'M' && (obsLen < 3 || (!esPersonal && !tieneFoto))) ok = false; if(ok) card.classList.remove('error-resaltado'); guardarProgresoTexto(); }
+    function verificarItemCompleto(id) { const r = document.querySelector(`input[name="p${id}"]:checked`); const card = document.getElementById('card-'+id); if(!r) return; const index = id - 1; const esPersonal = (preguntasData[index].z === "PERSONAL"); const obsLen = document.getElementById('obs-'+id).value.trim().length; const tieneFoto = document.getElementById('gal-'+id).children.length > 0; let ok = true; if(tieneFoto && obsLen < 3) ok = false; if(r.value === 'M' && (obsLen < 3 || (!esPersonal && !tieneFoto))) ok = false; if(ok) card.classList.remove('error-resaltado'); guardarProgresoTexto(); }
 
     function irAPaso2() { 
         const opVal = document.getElementById('info-op').value.trim();
-        const auditInput = document.getElementById('info-nro-audit');
-        const nAudit = parseInt(auditInput.value);
-        
+        const auditIn = document.getElementById('info-nro-audit').value;
         const ids = ['info-nro-audit','info-auditor','info-fecha','info-hora','info-linea','info-regulador','info-operador','info-verificador','info-estado','info-op','info-lote']; 
         let err = false; 
-
         ids.forEach(id => { 
-            const el = document.getElementById(id);
-            let campoInvalido = !el.value;
-            if (id === 'info-nro-audit' && (isNaN(nAudit) || nAudit <= 0 || !Number.isInteger(Number(el.value)))) { campoInvalido = true; }
-            if (id === 'info-op' && !/^(\d{9}|na)$/i.test(opVal)) { campoInvalido = true; }
-            if(campoInvalido) { el.classList.add('error-resaltado'); err = true; } 
-            else el.classList.remove('error-resaltado'); 
+            const el = document.getElementById(id); 
+            let valErr = !el.value; 
+            if(id==='info-op' && !/^(\d{9}|na)$/i.test(opVal)) valErr=true; 
+            if(id==='info-nro-audit' && (auditIn <= 0 || !Number.isInteger(Number(auditIn)))) valErr=true; 
+            if(valErr) { el.classList.add('error-resaltado'); err = true; } else el.classList.remove('error-resaltado'); 
         }); 
-
-        if(err) return alert("⚠️ Revise los campos:\n1. Nro Auditoría debe ser un entero positivo (1, 2, 3...)\n2. OP debe ser 9 dígitos o NA.\n3. Complete todos los datos obligatorios."); 
-        document.getElementById('paso1').classList.remove('active'); 
-        document.getElementById('paso2').classList.add('active'); 
-        window.scrollTo(0,0); 
+        if(err) return alert("Complete datos obligatorios. Nro Audit > 0 y OP 9 dígitos o NA."); 
+        document.getElementById('paso1').classList.remove('active'); document.getElementById('paso2').classList.add('active'); window.scrollTo(0,0); 
     }
 
     function quitarError(el) { el.classList.remove('error-resaltado'); guardarProgresoTexto(); }
@@ -251,16 +233,28 @@
             {header:'OP', key:'op', width:12},
             {header:'LOTE', key:'lote', width:12}
         ];
+
         for(let i=1; i<=preguntasData.length; i++) {
             const n = i < 10 ? '0'+i : i;
-            cols.push({header:`Item ${n}`, key:`p${i}`, width:10},{header:`Descripción ${n}`, key:`nc${i}`, width:25},{header:`Evidencia ${n}.1`, key:`e${i}_1`, width:25},{header:`Evidencia ${n}.2`, key:`e${i}_2`, width:25},{header:`Evidencia ${n}.3`, key:`e${i}_3`, width:25});
+            cols.push({header:`Item ${n}`, key:`p${i}`, width:10},{header:`Descripción ${n}`, key:`nc${i}`, width:25},{header:`Evidencia ${n}.1`, key:`e${i}_1`, width:22},{header:`Evidencia ${n}.2`, key:`e${i}_2`, width:22},{header:`Evidencia ${n}.3`, key:`e${i}_3`, width:22});
         }
         ws.columns = cols;
 
         const info = { clave: `${nAudit}-${linea}`, nra: nAudit, f: fechaParaExcel, hi: document.getElementById('info-hora').value, hf: ahora.getHours().toString().padStart(2, '0') + ':' + ahora.getMinutes().toString().padStart(2, '0'), a: document.getElementById('info-auditor').value, l: linea, reg: document.getElementById('info-regulador').value, ope: document.getElementById('info-operador').value.toUpperCase(), ver: document.getElementById('info-verificador').value.toUpperCase(), est: document.getElementById('info-estado').value, op: document.getElementById('info-op').value.toUpperCase(), lote: document.getElementById('info-lote').value.toUpperCase() };
-        for(let i=1; i<=preguntasData.length; i++) { const r = document.querySelector(`input[name="p${i}"]:checked`); info[`p${i}`] = r ? (r.value === 'B' ? 'BUENO' : (r.value === 'M' ? 'MALO' : 'NA')) : ''; info[`nc${i}`] = (r && r.value !== 'NA') ? document.getElementById('obs-'+i).value : ''; }
+
+        for(let i=1; i<=preguntasData.length; i++) { 
+            const r = document.querySelector(`input[name="p${i}"]:checked`); 
+            let valRes = '';
+            if (r) {
+                if (r.value === 'B') valRes = 'BUENO';
+                else if (r.value === 'M') valRes = 'MALO';
+                else if (r.value === 'NA') valRes = 'NO APLICA'; // MODIFICACIÓN ÍTEMS
+            }
+            info[`p${i}`] = valRes;
+            info[`nc${i}`] = (r && r.value !== 'NA') ? document.getElementById('obs-'+i).value : ''; 
+        }
         
-        const row = ws.addRow(info); row.height = 140;
+        const row = ws.addRow(info); row.height = 120;
 
         for(let i=1; i<=preguntasData.length; i++) {
             const r = document.querySelector(`input[name="p${i}"]:checked`);
@@ -270,8 +264,8 @@
                 for(let f = 0; f < thumbs.length; f++) {
                     const imgId = wb.addImage({ base64: thumbs[f].dataset.base, extension: 'png' });
                     ws.addImage(imgId, {
-                        tl: { col: startCol + f, row: row.number - 1 },
-                        br: { col: startCol + f + 1, row: row.number },
+                        tl: { col: startCol + f, row: row.number - 1, nativeColOff: 5 * 9525, nativeRowOff: 5 * 9525 },
+                        br: { col: startCol + f + 1, row: row.number, nativeColOff: -5 * 9525, nativeRowOff: -5 * 9525 },
                         editAs: 'oneCell'
                     });
                 }
